@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics", "ComputationalLinguistics\ComputationalLinguistics.csproj", "{ED2C213E-F83E-441B-B63F-77E67979789A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics.DAL", "ComputationalLinguistics.DAL\ComputationalLinguistics.DAL.csproj", "{1AC3E53B-EE6E-4290-862E-A24DF642E365}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ED2C213E-F83E-441B-B63F-77E67979789A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED2C213E-F83E-441B-B63F-77E67979789A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED2C213E-F83E-441B-B63F-77E67979789A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED2C213E-F83E-441B-B63F-77E67979789A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AC3E53B-EE6E-4290-862E-A24DF642E365}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AC3E53B-EE6E-4290-862E-A24DF642E365}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AC3E53B-EE6E-4290-862E-A24DF642E365}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AC3E53B-EE6E-4290-862E-A24DF642E365}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
