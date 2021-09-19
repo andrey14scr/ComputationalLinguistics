@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics.DAL", "ComputationalLinguistics.DAL\ComputationalLinguistics.DAL.csproj", "{1AC3E53B-EE6E-4290-862E-A24DF642E365}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics.Core", "ComputationalLinguistics.Core\ComputationalLinguistics.Core.csproj", "{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{1AC3E53B-EE6E-4290-862E-A24DF642E365}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AC3E53B-EE6E-4290-862E-A24DF642E365}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AC3E53B-EE6E-4290-862E-A24DF642E365}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

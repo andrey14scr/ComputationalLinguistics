@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ComputationalLinguistics.Core.Services.Implementation;
+using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.DAL;
 using ComputationalLinguistics.DAL.Core;
 using ComputationalLinguistics.DAL.Core.Entities;
 using ComputationalLinguistics.DAL.Repositories.Implementation;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
+using ComputationalLinguistics.Tools;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,6 +35,9 @@ namespace ComputationalLinguistics
             services.AddControllersWithViews();
             services.AddTransient<IRepository<Word>, WordRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IWordService, WordService>();
+
+            services.AddAutoMapper(typeof(AutoMap).Assembly);
             
             services.AddDbContext<ComputationalLinguisticsContext>(opt => 
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
