@@ -1,5 +1,5 @@
 ﻿@using ComputationalLinguistics.Controllers
-@model IEnumerable<WordViewModel>
+@model WordsList
 
 @{
     ViewData["Title"] = "Index";
@@ -8,27 +8,43 @@
 <div>
     <h2 style="float: left">Список доступных слов</h2>
     <p style="text-align: right">
-        <a asp-action="Create" class="btn btn-success" >Добавить</a>
+        <a asp-action="Create" class="btn btn-success">Добавить</a>
     </p>
 </div>
 
+<form asp-action="Index">
+    <div class="">
+        <div class="d-inline-flex p-2">
+            <label asp-for="SortBy">Сортировать по</label>
+        </div>
+        <div class="d-inline-flex p-2">
+            <select class="form-select" asp-for="SortBy">
+                <option value="abc">Алфавиту</option>
+                <option value="freq">Частоте</option>
+            </select>
+        </div>
+        <div class="d-inline-flex p-2">
+            <input type="submit" value="Применить">
+        </div>
+    </div>
+</form>
 
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                Слово
-            </th>
-            <th>
-                Частота
-            </th>
-            <th>
-                Действия
-            </th>
-        </tr>
+    <tr>
+        <th>
+            Слово
+        </th>
+        <th>
+            Частота
+        </th>
+        <th>
+            Действия
+        </th>
+    </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model) 
+    @foreach (var item in Model.Words)
     {
         <tr>
             <td>
@@ -46,3 +62,8 @@
     }
     </tbody>
 </table>
+
+@section Scripts
+{
+    
+}

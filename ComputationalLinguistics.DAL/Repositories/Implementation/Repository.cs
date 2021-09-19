@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ComputationalLinguistics.DAL.Core;
 using ComputationalLinguistics.DAL.Core.Entities;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ComputationalLinguistics.DAL.Repositories.Implementation
 {
@@ -27,6 +29,11 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
         public async Task<T> GetByIdAsync(Guid id)
         {
             return await _table.AsNoTracking().FirstOrDefaultAsync(o => o.Id.Equals(id));
+        }
+
+        public IQueryable<T> Get()
+        {
+            return _table.AsNoTracking();
         }
 
         public async Task AddAsync(T obj)

@@ -25,17 +25,28 @@ namespace ComputationalLinguistics.Controllers
             _mapper = mapper;
         }
 
-
-        // GET: WordsController
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index([Bind("SortBy")] string sortBy)
         {
-            var words = await _wordService.GetAll();
-            var model = _mapper.Map<IEnumerable<WordViewModel>>(words);
+            IEnumerable<WordDto> words = new List<WordDto>();
 
-            return View(model);
+            switch (sortBy)
+            {
+                case "abc":
+                    words = await _wordService.GetSortedBy(w => w.Content, false);
+                    break;
+                case "freq":
+                    words = await _wordService.GetSortedBy(w => w.Frequency);
+                    break;
+                default:
+                    words = await _wordService.GetAll();
+                    break;
+            }
+
+            var model = _mapper.Map<List<WordViewModel>>(words);
+
+            return View(new WordsList{Words = model});
         }
 
-        // GET: WordsController/Details/5
         public async Task<ActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -55,13 +66,11 @@ namespace ComputationalLinguistics.Controllers
             return View(model);
         }
 
-        // GET: WordsController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: WordsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind("Id,Content,Frequency")] WordDto wordDto)
@@ -75,7 +84,6 @@ namespace ComputationalLinguistics.Controllers
             return View(_mapper.Map<WordViewModel>(wordDto));
         }
 
-        // GET: WordsController/Edit/5
         public async Task<ActionResult> Edit(Guid? id, string from)
         {
             if (id == null)
@@ -89,7 +97,6 @@ namespace ComputationalLinguistics.Controllers
             return View(new WordViewModelWithPath { PreviousPage = from, WordViewModel = model });
         }
 
-        // POST: WordsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind("Id,Content,Frequency")] WordDto wordDto, string from)
@@ -97,23 +104,21 @@ namespace ComputationalLinguistics.Controllers
             if (ModelState.IsValid)
             {
                 await _wordService.Update(wordDto);
-                
+
                 return RedirectToAction(nameof(Index));
             }
 
             return RedirectToAction(from);
         }
 
-        // GET: WordsController/Delete/5
         public async Task<ActionResult> Delete(Guid id, string from)
         {
             var word = await _wordService.GetById(id);
             var model = _mapper.Map<WordViewModel>(word);
 
-            return View(new WordViewModelWithPath(){PreviousPage = from, WordViewModel = model});
+            return View(new WordViewModelWithPath() { PreviousPage = from, WordViewModel = model });
         }
 
-        // POST: WordsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(WordDto wordDto)

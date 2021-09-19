@@ -10,6 +10,7 @@ namespace ComputationalLinguistics.DAL.Repositories.Interfaces
     {
         Task<IReadOnlyCollection<T>> GetAllAsync();
         Task<T> GetByIdAsync(Guid id);
+        IQueryable<T> Get();
 
         Task AddAsync(T obj);
         Task AddRangeAsync(IEnumerable<T> objs);

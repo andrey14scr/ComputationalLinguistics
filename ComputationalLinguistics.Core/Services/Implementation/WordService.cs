@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,6 +10,7 @@ using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.DAL.Core.Entities;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComputationalLinguistics.Core.Services.Implementation
 {
@@ -71,6 +74,22 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             var words = _mapper.Map<List<Word>>(wordDtos);
             _unitOfWork.Words.RemoveRange(words);
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<WordDto>> GetSortedBy<T>(Expression<Func<Word, T>> keySelector, bool isDesc)
+        {
+            var words = new List<Word>();
+
+            if (isDesc)
+            {
+                words = await _unitOfWork.Words.Get().OrderByDescending(keySelector).ToListAsync();
+            }
+            else
+            {
+                words = await _unitOfWork.Words.Get().OrderBy(keySelector).ToListAsync();
+            }
+
+            return _mapper.Map<List<WordDto>>(words);
         }
     }
 }
