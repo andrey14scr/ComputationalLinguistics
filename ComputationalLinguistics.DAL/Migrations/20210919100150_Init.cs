@@ -12,8 +12,8 @@ namespace ComputationalLinguistics.DAL.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Content = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Frequency = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Content = table.Column<string>(type: "nvarchar(120)", nullable: false),
+                    Frequency = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

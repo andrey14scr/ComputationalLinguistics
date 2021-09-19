@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComputationalLinguistics.DAL.Migrations
 {
     [DbContext(typeof(ComputationalLinguisticsContext))]
-    [Migration("20210916151407_Init")]
+    [Migration("20210919100150_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,10 +28,10 @@ namespace ComputationalLinguistics.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(120)");
 
-                    b.Property<string>("Frequency")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Frequency")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

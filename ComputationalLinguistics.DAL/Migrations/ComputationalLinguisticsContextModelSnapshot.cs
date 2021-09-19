@@ -26,10 +26,10 @@ namespace ComputationalLinguistics.DAL.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(120)");
 
-                    b.Property<string>("Frequency")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Frequency")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
