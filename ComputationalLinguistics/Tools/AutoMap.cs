@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.DAL.Core.Entities;
+using ComputationalLinguistics.Models;
 
 namespace ComputationalLinguistics.Tools
 {
@@ -9,6 +10,7 @@ namespace ComputationalLinguistics.Tools
         public AutoMap()
         {
             CreateMap<WordDto, Word>().ReverseMap();
+            CreateMap<WordDto, WordViewModel>().ReverseMap();
         }
     }
 }

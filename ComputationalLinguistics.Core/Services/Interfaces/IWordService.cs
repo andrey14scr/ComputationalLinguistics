@@ -1,6 +1,9 @@
-﻿namespace ComputationalLinguistics.Core.Services.Interfaces
+﻿using ComputationalLinguistics.Core.Dto;
+using ComputationalLinguistics.DAL.Core.Entities;
+
+namespace ComputationalLinguistics.Core.Services.Interfaces
 {
-    public interface IWordService
+    public interface IWordService : IService<WordDto>
     {
         
     }

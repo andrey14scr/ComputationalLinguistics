@@ -19,5 +19,6 @@ namespace ComputationalLinguistics.DAL.Repositories.Interfaces
 
         Task RemoveByIdAsync(Guid id);
         void Remove(T obj);
+        void RemoveRange(IEnumerable<T> objs);
     }
 }

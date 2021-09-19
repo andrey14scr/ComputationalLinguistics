@@ -1,0 +1,34 @@
+﻿@using ComputationalLinguistics.Controllers
+@model WordViewModel
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Информация о слове <i>@Model.Content</i></h1>
+<hr />
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Написание
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Content
+        </dd>
+        <dt class="col-sm-2">
+            Частота
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Frequency
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" asp-route-from="@nameof(WordsController.Details)">Edit</a> |
+    <a asp-action="Delete" asp-route-id="@Model.Id" asp-route-from="@nameof(WordsController.Details)">Delete</a>
+    <br/>
+
+    <a asp-action="Index">
+        <input type="button" value="Вернуться к списку" />
+    </a>
+</div>

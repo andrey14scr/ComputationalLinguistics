@@ -58,7 +58,12 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
         {
             _table.Remove(obj);
         }
-        
+
+        public void RemoveRange(IEnumerable<T> objs)
+        {
+            _table.RemoveRange(objs);
+        }
+
         public void Dispose()
         {
             _context?.Dispose();

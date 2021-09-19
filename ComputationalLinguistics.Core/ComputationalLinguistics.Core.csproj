@@ -9,4 +9,8 @@
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\ComputationalLinguistics.DAL\ComputationalLinguistics.DAL.csproj" />
+    </ItemGroup>
+
 </Project>
