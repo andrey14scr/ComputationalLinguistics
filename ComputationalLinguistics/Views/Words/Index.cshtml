@@ -5,11 +5,14 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<div>
+    <h2 style="float: left">Список доступных слов</h2>
+    <p style="text-align: right">
+        <a asp-action="Create" class="btn btn-success" >Добавить</a>
+    </p>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+
 <table class="table">
     <thead>
         <tr>
@@ -35,9 +38,9 @@
                 @Html.DisplayFor(modelItem => item.Frequency)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id" asp-route-from="@nameof(WordsController.Index)">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id" asp-route-from="@nameof(WordsController.Index)">Delete</a>
+                <a asp-action="Details" asp-route-id="@item.Id"><input type="button" value="Описание" class="btn-info" /></a>
+                <a asp-action="Edit" asp-route-id="@item.Id" asp-route-from="@nameof(WordsController.Index)"><input type="button" value="Редактировать" class="btn-secondary" /></a>
+                <a asp-action="Delete" asp-route-id="@item.Id" asp-route-from="@nameof(WordsController.Index)"><input type="button" value="Удалить" class="btn-danger" /></a>
             </td>
         </tr>
     }

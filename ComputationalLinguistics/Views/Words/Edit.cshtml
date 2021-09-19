@@ -15,12 +15,12 @@
             <input type="hidden" asp-for="WordViewModel.Id" />
             <input type="hidden" asp-for="WordViewModel.Frequency" />
             <div class="form-group">
-                <label asp-for="WordViewModel.Content" class="control-label"></label>
+                <label asp-for="WordViewModel.Content" class="control-label">Написание</label>
                 <input asp-for="WordViewModel.Content" class="form-control" />
                 <span asp-validation-for="WordViewModel.Content" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Сохранить" class="btn btn-primary" />
             </div>
         </form>
     </div>

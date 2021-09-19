@@ -29,8 +29,10 @@
         <input type="hidden" asp-for="WordViewModel.Id" />
         <input type="hidden" asp-for="WordViewModel.Content" />
         <input type="hidden" asp-for="WordViewModel.Frequency" />
-        <input type="submit" value="Delete" class="btn btn-danger" />
+        <input type="submit" value="Подтвердить" class="btn btn-danger" />
     </form>
+    
+    <br/>
 
     @switch (Model.PreviousPage)
     {
