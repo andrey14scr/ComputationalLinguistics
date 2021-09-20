@@ -19,6 +19,7 @@
                 <input asp-for="WordViewModel.Content" class="form-control" />
                 <span asp-validation-for="WordViewModel.Content" class="text-danger"></span>
             </div>
+            <br />
             <div class="form-group">
                 <input type="submit" value="Сохранить" class="btn btn-primary" />
             </div>
@@ -30,12 +31,12 @@
 {
     case nameof(WordsController.Index):
         <a asp-action="Index">
-            <input type="button" value="Вернуться к списку"/>
+            <input class="mt-2" type="button" value="Вернуться к списку"/>
         </a>
         break;
     case nameof(WordsController.Details):
         <a asp-action="Details" asp-route-id="@Model.WordViewModel.Id">
-            <input type="button" value="Вернуться к описанию" />
+            <input class="mt-2" type="button" value="Вернуться к описанию" />
         </a>
         break;
 }

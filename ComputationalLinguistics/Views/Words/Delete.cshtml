@@ -31,19 +31,17 @@
         <input type="hidden" asp-for="WordViewModel.Frequency" />
         <input type="submit" value="Подтвердить" class="btn btn-danger" />
     </form>
-    
-    <br/>
 
     @switch (Model.PreviousPage)
     {
         case nameof(WordsController.Index):
             <a asp-action="Index">
-                <input type="button" value="Вернуться к списку"/>
+                <input class="mt-2" type="button" value="Вернуться к списку"/>
             </a>
             break;
         case nameof(WordsController.Details):
             <a asp-action="Details" asp-route-id="@Model.WordViewModel.Id">
-                <input type="button" value="Вернуться к описанию"/>
+                <input class="mt-2" type="button" value="Вернуться к описанию"/>
             </a>
             break;
     }

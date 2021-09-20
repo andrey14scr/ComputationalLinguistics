@@ -25,7 +25,7 @@ namespace ComputationalLinguistics.Controllers
             _mapper = mapper;
         }
 
-        public async Task<ActionResult> Index([Bind("SortBy")] string sortBy)
+        public async Task<ActionResult> Index(string sortBy, string pattern)
         {
             IEnumerable<WordDto> words = new List<WordDto>();
 
@@ -73,15 +73,30 @@ namespace ComputationalLinguistics.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind("Id,Content,Frequency")] WordDto wordDto)
+        public async Task<ActionResult> Create([Bind("Content")] CreateWordModel createWordModel)
         {
+            WordDto wordDto = null;
             if (ModelState.IsValid)
             {
-                await _wordService.Add(wordDto);
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    wordDto = new WordDto
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = createWordModel.Content,
+                        Frequency = 0,
+                    };
+                    await _wordService.Add(wordDto);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    
+                    throw;
+                }
             }
 
-            return View(_mapper.Map<WordViewModel>(wordDto));
+            return View(new CreateWordModel{Content = createWordModel.Content});
         }
 
         public async Task<ActionResult> Edit(Guid? id, string from)
