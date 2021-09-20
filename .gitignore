@@ -363,5 +363,5 @@ Desktop.ini
 .DS_Store
 
 # Ignore static files:
-# ComputationalLinguistics\ComputationalLinguistics\appsettings.json
+ComputationalLinguistics\ComputationalLinguistics\appsettings.json
 # ComputationalLinguistics\ComputationalLinguistics\appsettings.Development.json
