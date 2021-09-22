@@ -2,17 +2,15 @@
 var input = document.getElementById('inputPattern');
 
 select.onchange = checkHidden;
-let temp;
 
 function checkHidden(){    
-    if(select.options[select.selectedIndex].value === '_pattern'){
-        input.parentNode.style.padding = temp;
+    if (select.options[select.selectedIndex].value === '_pattern') {
+        input.parentNode.classList.add("p-2");
         input.value = '';
         input.hidden = false;
     }
-    else{
-        temp = input.style.padding;
+    else {
+        input.parentNode.classList.remove("p-2");
         input.hidden = true;
-        input.parentNode.style.padding = '0';
     }
 }

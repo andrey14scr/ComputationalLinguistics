@@ -25,16 +25,20 @@
                     <option value="@WordsList.OnPattern">Шаблону</option>
                 </select>
             </div>
-            <div class="d-inline-flex p-2">
-                @if (Model.SortBy == WordsList.OnPattern)
-                {
+
+            @if (Model.SortBy == WordsList.OnPattern)
+            {
+                <div class="d-inline-flex p-2">
                     <input value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">
-                }
-                else
-                {
-                    <input hidden value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">   
-                }
-            </div>
+                </div>
+            }
+            else
+            {
+                <div class="d-inline-flex">
+                    <input hidden value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">
+                </div>
+            }
+
             <div class="d-inline-flex p-2">
                 <input type="submit" value="Применить">
             </div>

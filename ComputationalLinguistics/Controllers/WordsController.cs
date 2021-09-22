@@ -11,6 +11,7 @@ using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.Models;
 using Microsoft.EntityFrameworkCore;
 using ComputationalLinguistics.DAL.Core.Entities;
+using ComputationalLinguistics.Tools;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -31,17 +32,15 @@ namespace ComputationalLinguistics.Controllers
 
             switch (sortBy)
             {
-                case WordsList.OnAlphabet:
-                    words = await _wordService.GetSortedBy(w => w.Content, false);
-                    break;
                 case WordsList.OnFrequency:
                     words = await _wordService.GetSortedBy(w => w.Frequency);
                     break;
                 case WordsList.OnPattern:
-                    words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern);
+                    if(!string.IsNullOrWhiteSpace(pattern))
+                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern);
                     break;
                 default:
-                    words = await _wordService.GetAll();
+                    words = await _wordService.GetSortedBy(w => w.Content, false);
                     pattern = string.Empty;
                     break;
             }
@@ -95,7 +94,9 @@ namespace ComputationalLinguistics.Controllers
                 }
                 catch (Exception ex)
                 {
-                    
+                    var msg = ExceptionBuilder.GetExceptionMessages(ex);
+
+                    return View("UserError", new UserErrorViewModel { Message = "Error while word creating", InnerMessages = msg });
                 }
             }
 
