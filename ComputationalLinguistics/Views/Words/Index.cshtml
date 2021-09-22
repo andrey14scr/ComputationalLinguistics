@@ -68,8 +68,8 @@
                 </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@item.Id"><input type="button" value="Описание" class="btn-info" /></a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" asp-route-from="@nameof(WordsController.Index)"><input type="button" value="Редактировать" class="btn-secondary" /></a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" asp-route-from="@nameof(WordsController.Index)"><input type="button" value="Удалить" class="btn-danger" /></a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Редактировать" class="btn-secondary" /></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Удалить" class="btn-danger" /></a>
                 </td>
             </tr>
         }

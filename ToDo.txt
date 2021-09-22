@@ -1,5 +1,5 @@
 + Create model
 frequency check
 + repeats of words
-in update + frequencies
-pattern
++ in update + frequencies
++ pattern

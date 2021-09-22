@@ -1,5 +1,5 @@
 ﻿@using ComputationalLinguistics.Controllers
-@model WordViewModelWithPath
+@model WordViewModelFrom
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,6 +12,7 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="PreviousPage" />
             <input type="hidden" asp-for="WordViewModel.Id" />
             <input type="hidden" asp-for="WordViewModel.Frequency" />
             <div class="form-group">

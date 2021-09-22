@@ -96,14 +96,13 @@ namespace ComputationalLinguistics.Controllers
                 catch (Exception ex)
                 {
                     
-                    throw;
                 }
             }
 
             return View(new CreateWordModel{Content = createWordModel.Content});
         }
 
-        public async Task<ActionResult> Edit(Guid? id, string from)
+        public async Task<ActionResult> Edit(Guid? id, string previousPage)
         {
             if (id == null)
             {
@@ -113,29 +112,32 @@ namespace ComputationalLinguistics.Controllers
             var word = await _wordService.GetById(id.Value);
             var model = _mapper.Map<WordViewModel>(word);
 
-            return View(new WordViewModelWithPath { PreviousPage = from, WordViewModel = model });
+            return View(new WordViewModelFrom { PreviousPage = previousPage, WordViewModel = model });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind("Id,Content,Frequency")] WordDto wordDto, string from)
+        public async Task<ActionResult> Edit(WordViewModelFrom wvm)
         {
             if (ModelState.IsValid)
             {
-                await _wordService.Update(wordDto);
+                await _wordService.Update(new WordDto
+                {
+                    Id = wvm.WordViewModel.Id, Content = wvm.WordViewModel.Content, Frequency = wvm.WordViewModel.Frequency
+                });
 
                 return RedirectToAction(nameof(Index));
             }
 
-            return RedirectToAction(from);
+            return RedirectToAction(wvm.PreviousPage);
         }
 
-        public async Task<ActionResult> Delete(Guid id, string from)
+        public async Task<ActionResult> Delete(Guid id, string previousPage)
         {
             var word = await _wordService.GetById(id);
             var model = _mapper.Map<WordViewModel>(word);
 
-            return View(new WordViewModelWithPath() { PreviousPage = from, WordViewModel = model });
+            return View(new WordViewModelFrom() { PreviousPage = previousPage, WordViewModel = model });
         }
 
         [HttpPost]

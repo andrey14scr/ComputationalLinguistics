@@ -58,7 +58,19 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         public async Task Update(WordDto wordDto)
         {
             var word = _mapper.Map<Word>(wordDto);
-            _unitOfWork.Words.Update(word);
+            var same = await _unitOfWork.Words.Get(w => w.Content == word.Content).FirstOrDefaultAsync();
+            
+            if (same is not null)
+            {
+                same.Frequency += word.Frequency;
+                _unitOfWork.Words.Update(same);
+                _unitOfWork.Words.Remove(word);
+            }
+            else
+            {
+                _unitOfWork.Words.Update(word);
+            }
+
             await _unitOfWork.SaveChangesAsync();
         }
 
