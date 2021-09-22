@@ -31,20 +31,24 @@ namespace ComputationalLinguistics.Controllers
 
             switch (sortBy)
             {
-                case "abc":
+                case WordsList.OnAlphabet:
                     words = await _wordService.GetSortedBy(w => w.Content, false);
                     break;
-                case "freq":
+                case WordsList.OnFrequency:
                     words = await _wordService.GetSortedBy(w => w.Frequency);
+                    break;
+                case WordsList.OnPattern:
+                    words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern);
                     break;
                 default:
                     words = await _wordService.GetAll();
+                    pattern = string.Empty;
                     break;
             }
 
             var model = _mapper.Map<List<WordViewModel>>(words);
 
-            return View(new WordsList{Words = model});
+            return View(new WordsList{Words = model, SortBy = sortBy, Pattern = pattern});
         }
 
         public async Task<ActionResult> Details(Guid? id)

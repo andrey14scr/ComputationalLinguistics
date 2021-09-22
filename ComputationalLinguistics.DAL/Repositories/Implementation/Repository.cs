@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using ComputationalLinguistics.DAL.Core;
 using ComputationalLinguistics.DAL.Core.Entities;
@@ -31,9 +32,9 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
             return await _table.AsNoTracking().FirstOrDefaultAsync(o => o.Id.Equals(id));
         }
 
-        public IQueryable<T> Get()
+        public IQueryable<T> Get(Expression<Func<T, bool>> predicate)
         {
-            return _table.AsNoTracking();
+            return predicate is null ? _table.AsNoTracking() : _table.Where(predicate).AsNoTracking();
         }
 
         public async Task AddAsync(T obj)

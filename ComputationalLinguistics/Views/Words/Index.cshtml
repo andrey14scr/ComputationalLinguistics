@@ -12,40 +12,35 @@
     </p>
 </div>
 
-@if (Model.Words.Count > 1)
-{
-    <div>
-        <form asp-action="Index">
-            <div>
-                <div class="d-inline-flex p-2">
-                    <label asp-for="SortBy">Сортировать по</label>
-                </div>
-                <div class="d-inline-flex p-2">
-                    <select class="form-select" asp-for="SortBy">
-                        <option value="abc">Алфавиту</option>
-                        <option value="freq">Частоте</option>
-                    </select>
-                </div>
-                <div class="d-inline-flex p-2">
-                    <input type="submit" value="Применить">
-                </div>
+<div>
+    <form asp-action="Index">
+        <div>
+            <div class="d-inline-flex p-2">
+                <label asp-for="SortBy">Сортировать по</label>
             </div>
-        </form>
-        <form asp-action="Index">
-            <div>
-                <div class="d-inline-flex p-2">
-                    <label asp-for="Pattern">Поиск по шаблону</label>
-                </div>
-                <div class="d-inline-flex p-2">
-                    <input asp-for="Pattern" placeholder="шаблон">
-                </div>
-                <div class="d-inline-flex p-2">
-                    <input type="submit" value="Поиск">
-                </div>
+            <div class="d-inline-flex p-2">
+                <select class="form-select" asp-for="SortBy" id="selectSort">
+                    <option value="@WordsList.OnAlphabet">Алфавиту</option>
+                    <option value="@WordsList.OnFrequency">Частоте</option>
+                    <option value="@WordsList.OnPattern">Шаблону</option>
+                </select>
             </div>
-        </form>
-    </div>
-}
+            <div class="d-inline-flex p-2">
+                @if (Model.SortBy == WordsList.OnPattern)
+                {
+                    <input value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">
+                }
+                else
+                {
+                    <input hidden value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">   
+                }
+            </div>
+            <div class="d-inline-flex p-2">
+                <input type="submit" value="Применить">
+            </div>
+        </div>
+    </form>
+</div>
 
 <table class="table">
     <thead>
@@ -83,5 +78,5 @@
 
 @section Scripts
 {
-
+    <script src="~/js/sortForm.js"></script>
 }

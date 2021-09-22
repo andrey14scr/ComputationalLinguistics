@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using ComputationalLinguistics.DAL.Core.Entities;
 
@@ -10,7 +11,7 @@ namespace ComputationalLinguistics.DAL.Repositories.Interfaces
     {
         Task<IReadOnlyCollection<T>> GetAllAsync();
         Task<T> GetByIdAsync(Guid id);
-        IQueryable<T> Get();
+        IQueryable<T> Get(Expression<Func<T, bool>> predicate = null);
 
         Task AddAsync(T obj);
         Task AddRangeAsync(IEnumerable<T> objs);

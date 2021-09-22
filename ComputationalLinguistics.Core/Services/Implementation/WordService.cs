@@ -79,7 +79,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         public async Task<IEnumerable<WordDto>> GetSortedBy<T>(Expression<Func<Word, T>> keySelector, bool isDesc)
         {
             var words = new List<Word>();
-
+            
             if (isDesc)
             {
                 words = await _unitOfWork.Words.Get().OrderByDescending(keySelector).ToListAsync();
@@ -89,6 +89,15 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 words = await _unitOfWork.Words.Get().OrderBy(keySelector).ToListAsync();
             }
 
+            return _mapper.Map<List<WordDto>>(words);
+        }
+
+        public async Task<IEnumerable<WordDto>> SortBy(Expression<Func<Word, bool>> predicate)
+        {
+            var words = new List<Word>();
+            
+            words = await _unitOfWork.Words.Get(predicate).ToListAsync();
+            
             return _mapper.Map<List<WordDto>>(words);
         }
     }
