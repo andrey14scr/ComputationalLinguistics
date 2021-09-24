@@ -34,6 +34,8 @@ namespace ComputationalLinguistics
         {
             services.AddControllersWithViews();
             services.AddTransient<IRepository<Word>, WordRepository>();
+            services.AddTransient<IRepository<WordInText>, WordInTextRepository>();
+            services.AddTransient<IRepository<TextFile>, TextFileRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IWordService, WordService>();
 

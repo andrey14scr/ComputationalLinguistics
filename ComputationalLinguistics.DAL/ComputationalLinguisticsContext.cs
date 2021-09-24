@@ -6,7 +6,10 @@ namespace ComputationalLinguistics.DAL
     public class ComputationalLinguisticsContext : DbContext
     {
         public DbSet<Word> Words { get; set; }
+        public DbSet<TextFile> TextFiles { get; set; }
+        public DbSet<WordInText> WordsInText { get; set; }
 
-        public ComputationalLinguisticsContext(DbContextOptions<ComputationalLinguisticsContext> options) : base(options) { }
+        public ComputationalLinguisticsContext(DbContextOptions<ComputationalLinguisticsContext> options) 
+            : base(options) { }
     }
 }
