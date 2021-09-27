@@ -1,8 +1,15 @@
-﻿@model TextFileInfoViewModel
+﻿@using System.Text.Json
+@model TextFileInfoViewModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
+<button if="nextWordBtn" onclick="findNextWord('@Html.Raw(JsonSerializer.Serialize(Model.Seeks))')">UPDATE</button>
 <h2>@Model.FileName</h2>
 <textarea id="text" name="textFile" style="width: 100%; height: 78vh;">@Model.Text</textarea>
+
+@section Scripts
+{
+    <script src="~/js/wordsInText.js"></script>
+}
