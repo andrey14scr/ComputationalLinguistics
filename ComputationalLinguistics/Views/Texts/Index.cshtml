@@ -19,6 +19,6 @@
 @foreach (var file in Model)
 {
     <p>
-        <span>&bull; @System.IO.Path.GetFileName(file.FilePath)</span>
+        &bull; <a asp-action="Details" asp-route-id="@file.Id">@System.IO.Path.GetFileName(file.FilePath)</a>
     </p>
 }

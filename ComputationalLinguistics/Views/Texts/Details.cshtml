@@ -1,0 +1,8 @@
+﻿@model TextFileInfoViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>@Model.FileName</h2>
+<textarea id="text" name="textFile" style="width: 100%; height: 78vh;">@Model.Text</textarea>

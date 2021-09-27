@@ -5,13 +5,11 @@ using ComputationalLinguistics.Models;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ComputationalLinguistics.Core.Dto;
-using ComputationalLinguistics.Core.Services.Implementation;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -58,7 +56,6 @@ namespace ComputationalLinguistics.Controllers
                 try
                 {
                     await _textService.ParseText(path);
-                    await _textService.Add(fileDto);
                 }
                 catch (Exception ex)
                 {
@@ -67,6 +64,17 @@ namespace ComputationalLinguistics.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Details(Guid id)
+        {
+            var textFile = await _textService.GetById(id);
+            var text = await System.IO.File.ReadAllTextAsync(textFile.FilePath);
+            return View(new TextFileInfoViewModel
+            {
+                Text = text, 
+                FileName = Path.GetFileName(textFile.FilePath),
+            });
         }
     }
 }
