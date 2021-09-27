@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.DAL.Core.Entities;
-using ComputationalLinguistics.DAL.Repositories.Implementation;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace ComputationalLinguistics.Core.Services.Implementation
 {
@@ -24,6 +21,57 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<TextFileDto>> GetAll()
+        {
+            var textFiles = await _unitOfWork.TextFiles.GetAllAsync();
+            var textFileDtos = _mapper.Map<List<TextFileDto>>(textFiles);
+
+            return textFileDtos;
+        }
+
+        public async Task<TextFileDto> GetById(Guid id)
+        {
+            var textFile = await _unitOfWork.TextFiles.GetByIdAsync(id);
+            var textFileDto = _mapper.Map<TextFileDto>(textFile);
+
+            return textFileDto;
+        }
+
+        public async Task Add(TextFileDto textFileDto)
+        {
+            var textFile = _mapper.Map<TextFile>(textFileDto);
+            await _unitOfWork.TextFiles.AddAsync(textFile);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task AddRange(IEnumerable<TextFileDto> textFileDtos)
+        {
+            var textFiles = _mapper.Map<List<TextFile>>(textFileDtos);
+            await _unitOfWork.TextFiles.AddRangeAsync(textFiles);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task Update(TextFileDto textFileDto)
+        {
+            var textFile = _mapper.Map<TextFile>(textFileDto);
+            _unitOfWork.TextFiles.Update(textFile);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task Remove(TextFileDto textFileDto)
+        {
+            var textFile = _mapper.Map<TextFile>(textFileDto);
+            _unitOfWork.TextFiles.Remove(textFile);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task RemoveRange(IEnumerable<TextFileDto> textFileDtos)
+        {
+            var textFiles = _mapper.Map<List<TextFile>>(textFileDtos);
+            _unitOfWork.TextFiles.RemoveRange(textFiles);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task ParseText(string fileName)

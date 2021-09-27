@@ -12,7 +12,6 @@ namespace ComputationalLinguistics.Core.Services.Interfaces
     {
         Task<IEnumerable<WordDto>> GetSortedBy<T>(Expression<Func<Word, T>> keySelector, bool isDesc = true);
         Task<IEnumerable<WordDto>> SortBy(Expression<Func<Word, bool>> predicate);
-        Task UpdateFrequencyAsync(WordDto wordDto);
         Task<IEnumerable<WordContextInfo>> GetContext(Guid id);
     }
 }

@@ -11,6 +11,9 @@ namespace ComputationalLinguistics.Tools
         {
             CreateMap<WordDto, Word>().ReverseMap();
             CreateMap<WordDto, WordViewModel>().ReverseMap();
+
+            CreateMap<TextFileDto, TextFile>().ReverseMap();
+            CreateMap<TextFileDto, TextFileViewModel>().ReverseMap();
         }
     }
 }

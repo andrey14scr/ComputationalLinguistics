@@ -57,25 +57,6 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task Update(WordDto wordDto)
-        {
-            var word = _mapper.Map<Word>(wordDto);
-            var same = await _unitOfWork.Words.Get(w => w.Content == word.Content).FirstOrDefaultAsync();
-            
-            if (same is not null)
-            {
-                same.Frequency += word.Frequency;
-                _unitOfWork.Words.Update(same);
-                _unitOfWork.Words.Remove(word);
-            }
-            else
-            {
-                _unitOfWork.Words.Update(word);
-            }
-
-            await _unitOfWork.SaveChangesAsync();
-        }
-
         public async Task Remove(WordDto wordDto)
         {
             var word = _mapper.Map<Word>(wordDto);
@@ -115,10 +96,10 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             return _mapper.Map<List<WordDto>>(words);
         }
 
-        public async Task UpdateFrequencyAsync(WordDto wordDto)
+        public async Task Update(WordDto wordDto)
         {
             var word = _mapper.Map<Word>(wordDto);
-            await (_unitOfWork.Words as WordRepository).UpdateFrequencyAsync(word);
+            _unitOfWork.Words.Update(word);
             await _unitOfWork.SaveChangesAsync();
         }
 
