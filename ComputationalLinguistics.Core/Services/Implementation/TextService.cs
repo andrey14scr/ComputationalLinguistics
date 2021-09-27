@@ -90,7 +90,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                                 {
                                     Id = wordInDb.Id,
                                     Content = temp,
-                                    Frequency = wordInDb.Frequency,
+                                    Frequency = wordInDb.Frequency + 1,
                                 };
                                 oldWords.Add(wordInList);
                             }

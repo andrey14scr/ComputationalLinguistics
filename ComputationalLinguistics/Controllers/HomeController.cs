@@ -23,7 +23,7 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<IActionResult> Index()
         {
-            await _textService.ParseText(@"D:\fff.txt");
+            await _textService.ParseText(@"D:\fff2.txt");
 
             return View();
         }
