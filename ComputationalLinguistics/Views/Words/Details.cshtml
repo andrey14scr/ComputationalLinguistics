@@ -29,7 +29,7 @@
     @foreach (var file in Model.WordContextFiles)
     {
         <li>
-            <a asp-controller="Texts" asp-action="Details" asp-route-id="@file.TextFileId">@System.IO.Path.GetFileName(file.TextFilePath)</a>
+            <a asp-controller="Texts" asp-action="Details" asp-route-id="@file.TextFileId" asp-route-wordId="@Model.Id">@System.IO.Path.GetFileName(file.TextFilePath)</a>
         </li>
     }
 </ul>

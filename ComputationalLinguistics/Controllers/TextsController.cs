@@ -16,12 +16,14 @@ namespace ComputationalLinguistics.Controllers
     public class TextsController : Controller
     {
         private readonly ITextService _textService;
+        private readonly IWordService _wordService;
         private readonly IMapper _mapper;
 
-        public TextsController(ITextService textService, IMapper mapper)
+        public TextsController(ITextService textService, IMapper mapper, IWordService wordService)
         {
             _textService = textService;
             _mapper = mapper;
+            _wordService = wordService;
         }
 
         public async Task<IActionResult> Index()
@@ -64,15 +66,24 @@ namespace ComputationalLinguistics.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Details(Guid id)
+        public async Task<IActionResult> Details(Guid id, Guid? wordId)
         {
             var textFile = await _textService.GetById(id);
             var text = await System.IO.File.ReadAllTextAsync(textFile.FilePath);
-            return View(new TextFileInfoViewModel
+
+            var model = new TextFileInfoViewModel
             {
-                Text = text, 
+                Text = text,
                 FileName = Path.GetFileName(textFile.FilePath),
-            });
+            };
+
+            if (wordId.HasValue)
+            {
+                var seeks = await _wordService.GetUsages(wordId.Value, id);
+                model.Seeks = seeks;
+            }
+
+            return View(model);
         }
     }
 }

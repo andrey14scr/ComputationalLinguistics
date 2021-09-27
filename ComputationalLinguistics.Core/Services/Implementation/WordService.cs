@@ -114,5 +114,12 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 .Distinct()
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<int>> GetUsages(Guid wordId, Guid textFileId)
+        {
+            return await _unitOfWork.WordsInText.Get(wt => wt.WordId == wordId && wt.TextFileId == textFileId)
+                .Select(w => w.Seek)
+                .ToListAsync();
+        }
     }
 }
