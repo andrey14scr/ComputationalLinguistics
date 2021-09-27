@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 using System;
 using System.Collections.Generic;
@@ -9,8 +8,6 @@ using AutoMapper;
 using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.Models;
-using Microsoft.EntityFrameworkCore;
-using ComputationalLinguistics.DAL.Core.Entities;
 using ComputationalLinguistics.Tools;
 
 namespace ComputationalLinguistics.Controllers
@@ -28,7 +25,7 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<ActionResult> Index(string sortBy, string pattern)
         {
-            var r = await _wordService.GetContext(new Guid("d7b7283a-e1f7-46c0-82c4-222d80f84530"));
+            var r = await _wordService.GetContextFiles(new Guid("d7b7283a-e1f7-46c0-82c4-222d80f84530"));
             IEnumerable<WordDto> words = new List<WordDto>();
 
             switch (sortBy)
@@ -59,6 +56,7 @@ namespace ComputationalLinguistics.Controllers
             }
 
             var word = await _wordService.GetById(id.Value);
+            var contextFiles = await _wordService.GetContextFiles(id.Value);
 
             if (word == null)
             {
@@ -66,6 +64,7 @@ namespace ComputationalLinguistics.Controllers
             }
 
             var model = _mapper.Map<WordViewModel>(word);
+            model.WordContextFiles = contextFiles;
 
             return View(model);
         }

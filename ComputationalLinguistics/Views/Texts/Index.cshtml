@@ -16,9 +16,11 @@
 
 <br/>
 <h3>Все файлы</h3>
-@foreach (var file in Model)
-{
-    <p>
-        &bull; <a asp-action="Details" asp-route-id="@file.Id">@System.IO.Path.GetFileName(file.FilePath)</a>
-    </p>
-}
+<ul>
+    @foreach (var file in Model)
+    {
+        <li>
+            <a asp-action="Details" asp-route-id="@file.Id">@System.IO.Path.GetFileName(file.FilePath)</a>
+        </li>
+    }
+</ul>

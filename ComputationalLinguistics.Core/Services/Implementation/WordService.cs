@@ -103,9 +103,16 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<WordContextInfo>> GetContext(Guid id)
+        public async Task<IEnumerable<WordContextFile>> GetContextFiles(Guid id)
         {
-            return await _unitOfWork.WordsInText.Get(wt => wt.WordId == id).Select(w => new WordContextInfo { Seek = w.Seek, TextFileID = w.TextFileId}).ToListAsync();
+            return await _unitOfWork.WordsInText.Get(wt => wt.WordId == id)
+                .Select(w => new WordContextFile 
+                {
+                    TextFileId = w.TextFileId, 
+                    TextFilePath = _unitOfWork.TextFiles.GetByIdAsync(w.TextFileId).Result.FilePath
+                })
+                .Distinct()
+                .ToListAsync();
         }
     }
 }

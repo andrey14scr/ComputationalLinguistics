@@ -41,17 +41,15 @@ namespace ComputationalLinguistics.Controllers
                 }
 
                 var path = Path.Combine("TextFiles", uploadedFile.FileName);
+                if (System.IO.File.Exists(path))
+                {
+                    return View("UserError", new UserErrorViewModel { Message = "Such file already exists"});
+                }
 
                 using (var fileStream = new FileStream(path, FileMode.Create))
                 {
                     await uploadedFile.CopyToAsync(fileStream);
                 }
-
-                var fileDto = new TextFileDto
-                {
-                    Id = Guid.NewGuid(), 
-                    FilePath = path,
-                };
 
                 try
                 {
