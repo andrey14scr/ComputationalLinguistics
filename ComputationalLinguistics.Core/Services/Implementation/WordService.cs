@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 
 using ComputationalLinguistics.Core.Dto;
+using ComputationalLinguistics.Core.Models;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.DAL.Core.Entities;
 using ComputationalLinguistics.DAL.Repositories.Implementation;
@@ -119,6 +120,11 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             var word = _mapper.Map<Word>(wordDto);
             await (_unitOfWork.Words as WordRepository).UpdateFrequencyAsync(word);
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<WordContextInfo>> GetContext(Guid id)
+        {
+            return await _unitOfWork.WordsInText.Get(wt => wt.WordId == id).Select(w => new WordContextInfo { Seek = w.Seek, TextFileID = w.TextFileId}).ToListAsync();
         }
     }
 }

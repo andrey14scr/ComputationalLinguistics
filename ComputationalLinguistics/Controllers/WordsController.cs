@@ -28,6 +28,7 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<ActionResult> Index(string sortBy, string pattern)
         {
+            var r = await _wordService.GetContext(new Guid("d7b7283a-e1f7-46c0-82c4-222d80f84530"));
             IEnumerable<WordDto> words = new List<WordDto>();
 
             switch (sortBy)
