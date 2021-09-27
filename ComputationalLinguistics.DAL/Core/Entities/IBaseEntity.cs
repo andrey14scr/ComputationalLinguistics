@@ -4,6 +4,6 @@ namespace ComputationalLinguistics.DAL.Core.Entities
 {
     public interface IBaseEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
     }
 }

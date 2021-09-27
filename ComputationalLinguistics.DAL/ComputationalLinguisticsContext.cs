@@ -11,5 +11,11 @@ namespace ComputationalLinguistics.DAL
 
         public ComputationalLinguisticsContext(DbContextOptions<ComputationalLinguisticsContext> options) 
             : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<WordInText>()
+                .HasKey(o => new { o.TextFileId, o.Seek });
+        }
     }
 }

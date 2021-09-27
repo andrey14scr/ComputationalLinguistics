@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComputationalLinguistics.DAL.Migrations
 {
     [DbContext(typeof(ComputationalLinguisticsContext))]
-    [Migration("20210924153254_Initial")]
-    partial class Initial
+    [Migration("20210926210838_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,10 +23,9 @@ namespace ComputationalLinguistics.DAL.Migrations
 
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.TextFile", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("FilePath")
                         .HasColumnType("nvarchar(200)");
@@ -40,10 +39,9 @@ namespace ComputationalLinguistics.DAL.Migrations
 
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.Word", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(120)");
@@ -60,26 +58,18 @@ namespace ComputationalLinguistics.DAL.Migrations
 
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.WordInText", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<Guid>("TextFileId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Seek")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TextFileId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("WordId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("TextId")
-                        .HasColumnType("int");
+                    b.HasKey("TextFileId", "Seek");
 
-                    b.Property<int>("WordId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TextFileId");
+                    b.HasIndex(new[] { "TextFileId", "Seek" }, "ITextFileId");
 
                     b.HasIndex(new[] { "WordId" }, "IWordId");
 
@@ -90,7 +80,9 @@ namespace ComputationalLinguistics.DAL.Migrations
                 {
                     b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TextFile", "TextFile")
                         .WithMany()
-                        .HasForeignKey("TextFileId");
+                        .HasForeignKey("TextFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ComputationalLinguistics.DAL.Core.Entities.Word", "Word")
                         .WithMany()

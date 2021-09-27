@@ -38,6 +38,7 @@ namespace ComputationalLinguistics
             services.AddTransient<IRepository<TextFile>, TextFileRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IWordService, WordService>();
+            services.AddScoped<ITextService, TextService>();
 
             services.AddAutoMapper(typeof(AutoMap).Assembly);
             

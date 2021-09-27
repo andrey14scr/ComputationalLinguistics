@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ComputationalLinguistics.DAL.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -10,8 +11,7 @@ namespace ComputationalLinguistics.DAL.Migrations
                 name: "TextFiles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FilePath = table.Column<string>(type: "nvarchar(200)", nullable: false)
                 },
                 constraints: table =>
@@ -23,8 +23,7 @@ namespace ComputationalLinguistics.DAL.Migrations
                 name: "Words",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(120)", nullable: false),
                     Frequency = table.Column<int>(type: "int", nullable: false)
                 },
@@ -37,21 +36,19 @@ namespace ComputationalLinguistics.DAL.Migrations
                 name: "WordsInText",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TextFileId = table.Column<int>(type: "int", nullable: false),
+                    TextFileId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Seek = table.Column<int>(type: "int", nullable: false),
-                    WordId = table.Column<int>(type: "int", nullable: false)
+                    WordId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WordsInText", x => x.Id);
+                    table.PrimaryKey("PK_WordsInText", x => new { x.TextFileId, x.Seek });
                     table.ForeignKey(
                         name: "FK_WordsInText_TextFiles_TextFileId",
                         column: x => x.TextFileId,
                         principalTable: "TextFiles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_WordsInText_Words_WordId",
                         column: x => x.WordId,
@@ -71,14 +68,14 @@ namespace ComputationalLinguistics.DAL.Migrations
                 column: "Content");
 
             migrationBuilder.CreateIndex(
+                name: "ITextFileId",
+                table: "WordsInText",
+                columns: new[] { "TextFileId", "Seek" });
+
+            migrationBuilder.CreateIndex(
                 name: "IWordId",
                 table: "WordsInText",
                 column: "WordId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WordsInText_TextFileId",
-                table: "WordsInText",
-                column: "TextFileId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -9,6 +9,7 @@ using AutoMapper;
 using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.DAL.Core.Entities;
+using ComputationalLinguistics.DAL.Repositories.Implementation;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -111,6 +112,13 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             words = await _unitOfWork.Words.Get(predicate).ToListAsync();
             
             return _mapper.Map<List<WordDto>>(words);
+        }
+
+        public async Task UpdateFrequencyAsync(WordDto wordDto)
+        {
+            var word = _mapper.Map<Word>(wordDto);
+            await (_unitOfWork.Words as WordRepository).UpdateFrequencyAsync(word);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

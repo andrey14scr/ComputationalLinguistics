@@ -1,25 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
+using ComputationalLinguistics.Core.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ComputationalLinguistics.Models;
+using ComputationalLinguistics.Core.Services.Interfaces;
 
 namespace ComputationalLinguistics.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IWordService _wordService;
+        private readonly ITextService _textService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IWordService wordService, ITextService textService)
         {
             _logger = logger;
+            _wordService = wordService;
+            _textService = textService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            await _textService.ParseText(@"D:\fff.txt");
+
             return View();
         }
 

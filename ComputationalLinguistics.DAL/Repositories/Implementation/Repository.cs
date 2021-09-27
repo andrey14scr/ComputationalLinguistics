@@ -13,8 +13,8 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
 {
     public class Repository<T> : IRepository<T> where T : class, IBaseEntity
     {
-        private readonly ComputationalLinguisticsContext _context;
-        private readonly DbSet<T> _table;
+        protected readonly ComputationalLinguisticsContext _context;
+        protected readonly DbSet<T> _table;
 
         public Repository(ComputationalLinguisticsContext context)
         {

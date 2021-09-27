@@ -9,7 +9,7 @@ namespace ComputationalLinguistics.DAL.Core.Entities
     [Index(nameof(Content), Name = "IContent")]
     public class Word : IBaseEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         
         [Column(TypeName = "nvarchar(120)")]
         public string Content { get; set; }
