@@ -70,27 +70,27 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<WordDto>> GetSortedBy<T>(Expression<Func<Word, T>> keySelector, bool isDesc)
+        public async Task<IEnumerable<WordDto>> GetSortedBy<T>(Expression<Func<Word, T>> keySelector, int skip, int take, bool isDesc = true)
         {
             var words = new List<Word>();
             
             if (isDesc)
             {
-                words = await _unitOfWork.Words.Get().OrderByDescending(keySelector).ToListAsync();
+                words = await _unitOfWork.Words.Get().OrderByDescending(keySelector).Skip(skip).Take(take).ToListAsync();
             }
             else
             {
-                words = await _unitOfWork.Words.Get().OrderBy(keySelector).ToListAsync();
+                words = await _unitOfWork.Words.Get().OrderBy(keySelector).Skip(skip).Take(take).ToListAsync();
             }
 
             return _mapper.Map<List<WordDto>>(words);
         }
 
-        public async Task<IEnumerable<WordDto>> SortBy(Expression<Func<Word, bool>> predicate)
+        public async Task<IEnumerable<WordDto>> SortBy(Expression<Func<Word, bool>> predicate, int skip, int take)
         {
             var words = new List<Word>();
             
-            words = await _unitOfWork.Words.Get(predicate).ToListAsync();
+            words = await _unitOfWork.Words.Get(predicate).Skip(skip).Take(take).ToListAsync();
             
             return _mapper.Map<List<WordDto>>(words);
         }

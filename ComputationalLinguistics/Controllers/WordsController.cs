@@ -25,20 +25,24 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<ActionResult> Index(string sortBy, string pattern, int wordsBlockSize)
         {
-            var r = await _wordService.GetContextFiles(new Guid("d7b7283a-e1f7-46c0-82c4-222d80f84530"));
+            if (wordsBlockSize <= 0)
+            {
+                wordsBlockSize = Variables.WordsBlockSize;
+            }
+
             IEnumerable<WordDto> words = new List<WordDto>();
 
             switch (sortBy)
             {
-                case WordsListViewModel.OnFrequency:
-                    words = await _wordService.GetSortedBy(w => w.Frequency);
+                case Variables.OnFrequencyPattern:
+                    words = await _wordService.GetSortedBy(w => w.Frequency, 0, wordsBlockSize);
                     break;
-                case WordsListViewModel.OnPattern:
+                case Variables.OnPatternPattern:
                     if(!string.IsNullOrWhiteSpace(pattern))
-                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern);
+                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern, 0, wordsBlockSize);
                     break;
                 default:
-                    words = await _wordService.GetSortedBy(w => w.Content, false);
+                    words = await _wordService.GetSortedBy(w => w.Content, 0, wordsBlockSize, false);
                     pattern = string.Empty;
                     break;
             }
@@ -158,38 +162,23 @@ namespace ComputationalLinguistics.Controllers
         
         public async Task<ActionResult> List(string sortBy, string pattern, int skip, int next)
         {
-            var r = await _wordService.GetContextFiles(new Guid("d7b7283a-e1f7-46c0-82c4-222d80f84530"));
             IEnumerable<WordDto> words = new List<WordDto>();
 
             switch (sortBy)
             {
-                case WordsListViewModel.OnFrequency:
-                    words = await _wordService.GetSortedBy(w => w.Frequency);
+                case Variables.OnFrequencyPattern:
+                    words = await _wordService.GetSortedBy(w => w.Frequency, skip, next);
                     break;
-                case WordsListViewModel.OnPattern:
+                case Variables.OnPatternPattern:
                     if(!string.IsNullOrWhiteSpace(pattern))
-                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern);
+                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern, skip, next);
                     break;
                 default:
-                    words = await _wordService.GetSortedBy(w => w.Content, false);
-                    pattern = string.Empty;
+                    words = await _wordService.GetSortedBy(w => w.Content, skip, next, false);
                     break;
             }
-
-            var model = _mapper.Map<List<WordViewModel>>(words);
-
-            return View(new WordsListViewModel
-            {
-                Words = model, 
-                SortBy = sortBy, 
-                Pattern = pattern, 
-                WordsBlockSize = wordsBlockSize,
-            });
-        }
-
-        private async Task<bool> PersonExists(Guid id)
-        {
-            return (await _wordService.GetById(id)) != null;
+            
+            return View(words);
         }
     }
 }

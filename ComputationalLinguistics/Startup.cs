@@ -60,6 +60,8 @@ namespace ComputationalLinguistics
                 app.UseHsts();
             }
 
+            Variables.WordsBlockSize = Convert.ToInt32(Configuration["Variables:WordsBlockSize"]);
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

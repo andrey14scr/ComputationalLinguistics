@@ -9,7 +9,7 @@
 <form asp-action="Add" asp-controller="Texts" method="post" enctype="multipart/form-data">
     <div class="mb-3" style="width: 500px">
         <label for="formFile" class="form-label">Выберите файл для загрузки</label>
-        <input class="form-control" type="file" id="formFile" name="uploadedFile">
+        <input class="form-control" type="file" accept=".txt" id="formFile" name="uploadedFile">
     </div>
     <input type="submit" class="btn btn-light" value="Загрузить" />
 </form>

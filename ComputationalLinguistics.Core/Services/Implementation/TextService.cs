@@ -144,7 +144,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                         position++;
                     }
 
-                    if (!char.IsPunctuation(next) && next != ' ')
+                    if (!char.IsPunctuation(next) && next != ' ' && next != '\n')
                     {
                         sb.Append(next);
                     }
@@ -152,7 +152,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     {
                         var temp = sb.ToString().Trim(' ', '\r', '\n').ToLower();
 
-                        if (string.IsNullOrWhiteSpace(temp) || int.TryParse(temp, out _))
+                        if (string.IsNullOrWhiteSpace(temp) || !char.IsLetter(temp[0]))
                         {
                             sb.Clear();
                             continue;

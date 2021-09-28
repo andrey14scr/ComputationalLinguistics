@@ -1,4 +1,5 @@
 ﻿@using ComputationalLinguistics.Controllers
+@using ComputationalLinguistics.Tools
 @model WordsListViewModel
 
 @{
@@ -20,13 +21,13 @@
             </div>
             <div class="d-inline-flex p-2">
                 <select class="form-select" asp-for="SortBy" id="selectSort">
-                    <option value="@WordsListViewModel.OnAlphabet">Алфавиту</option>
-                    <option value="@WordsListViewModel.OnFrequency">Частоте</option>
-                    <option value="@WordsListViewModel.OnPattern">Шаблону</option>
+                    <option value="@Variables.OnAlphabetPattern">Алфавиту</option>
+                    <option value="@Variables.OnFrequencyPattern">Частоте</option>
+                    <option value="@Variables.OnPatternPattern">Шаблону</option>
                 </select>
             </div>
 
-            @if (Model.SortBy == WordsListViewModel.OnPattern)
+            @if (Model.SortBy == Variables.OnPatternPattern)
             {
                 <div class="d-inline-flex p-2">
                     <input value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">
@@ -61,7 +62,7 @@
                     </th>
                 </tr>
             </thead>
-        <tbody>
+        <tbody id="tableBody">
             @foreach (var item in Model.Words)
             {
                 <tr>
@@ -82,7 +83,7 @@
     </table>
 </div>
 
-<button id="adding-words-btn" class="btn btn-primary col-sm-12 mt-4" onclick="c('@Model.Words.Count, @Model.WordsBlockSize')">
+<button id="adding-words-btn" class="btn btn-primary col-sm-12 mt-4" onclick="getWords('@Model.WordsBlockSize', '@Model.SortBy', '@Model.Pattern')">
     Загрузить следующие
 </button>
 
