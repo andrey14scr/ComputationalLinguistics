@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AutoMapper;
 
@@ -37,7 +36,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
         public async Task<WordDto> GetById(Guid id)
         {
-            var word = await _unitOfWork.Words.GetByIdAsync(id);
+            var word = await (_unitOfWork.Words as WordRepository).GetByIdAsync(id);
             var wordDto = _mapper.Map<WordDto>(word);
 
             return wordDto;
@@ -109,7 +108,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 .Select(w => new WordContextFile 
                 {
                     TextFileId = w.TextFileId, 
-                    TextFilePath = _unitOfWork.TextFiles.GetByIdAsync(w.TextFileId).Result.FilePath
+                    TextFilePath = (_unitOfWork.TextFiles as TextFileRepository).GetByIdAsync(w.TextFileId).Result.FilePath
                 })
                 .Distinct()
                 .ToListAsync();

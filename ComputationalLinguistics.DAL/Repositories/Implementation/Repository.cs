@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using ComputationalLinguistics.DAL.Core;
-using ComputationalLinguistics.DAL.Core.Entities;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ComputationalLinguistics.DAL.Repositories.Implementation
 {
-    public class Repository<T> : IRepository<T> where T : class, IBaseEntity
+    public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly ComputationalLinguisticsContext _context;
         protected readonly DbSet<T> _table;
@@ -25,11 +22,6 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
         public async Task<IReadOnlyCollection<T>> GetAllAsync()
         {
             return await _table.AsNoTracking().ToListAsync();
-        }
-
-        public async Task<T> GetByIdAsync(Guid id)
-        {
-            return await _table.AsNoTracking().FirstOrDefaultAsync(o => o.Id.Equals(id));
         }
 
         public IQueryable<T> Get(Expression<Func<T, bool>> predicate)
@@ -55,11 +47,6 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
         public void UpdateRange(IEnumerable<T> objs)
         {
             _table.UpdateRange(objs);
-        }
-
-        public async Task RemoveByIdAsync(Guid id)
-        {
-            _table.Remove(await GetByIdAsync(id));
         }
 
         public void Remove(T obj)

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ComputationalLinguistics.DAL.Core.Entities
 {
     [Index(nameof(FilePath), Name = "IFilePath")]
-    public class TextFile : IBaseEntity
+    public class TextFile
     {
         public Guid Id { get; set; }
         [Column(TypeName = "nvarchar(200)")]

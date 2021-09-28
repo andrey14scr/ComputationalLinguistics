@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.DAL.Core.Entities;
+using ComputationalLinguistics.DAL.Repositories.Implementation;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+
+using Newtonsoft.Json.Linq;
 
 namespace ComputationalLinguistics.Core.Services.Implementation
 {
@@ -33,10 +37,15 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
         public async Task<TextFileDto> GetById(Guid id)
         {
-            var textFile = await _unitOfWork.TextFiles.GetByIdAsync(id);
+            var textFile = await (_unitOfWork.TextFiles as TextFileRepository).GetByIdAsync(id);
             var textFileDto = _mapper.Map<TextFileDto>(textFile);
 
             return textFileDto;
+        }
+
+        public async Task<bool> Exists(string path)
+        {
+            return await _unitOfWork.TextFiles.Get().AnyAsync(f => f.FilePath == path);
         }
 
         public async Task Add(TextFileDto textFileDto)
@@ -102,6 +111,12 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 while (sr.Peek() >= 0)
                 {
                     var next = (char)sr.Read();
+
+                    if (next != '\r')
+                    {
+                        position++;
+                    }
+
                     if (!char.IsPunctuation(next) && next != ' ')
                     {
                         sb.Append(next);
@@ -113,7 +128,6 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                         if (string.IsNullOrWhiteSpace(temp) || int.TryParse(temp, out _))
                         {
                             sb.Clear();
-                            position++;
                             continue;
                         }
 
@@ -150,22 +164,78 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
                         wordsInText.Add(new WordInText
                         {
-                            Id = Guid.NewGuid(),
-                            Seek = position - temp.Length, 
+                            Seek = position - temp.Length - 1, 
                             TextFileId = textId,
                             WordId = wordInList.Id,
                         });
 
                         sb.Clear();
                     }
-
-                    position++;
                 }
             }
 
             await _unitOfWork.Words.AddRangeAsync(newWords);
             _unitOfWork.Words.UpdateRange(oldWords);
             await _unitOfWork.WordsInText.AddRangeAsync(wordsInText);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task ParseTextSuper(string fileName)
+        {
+            var textFile = await _unitOfWork.TextFiles.Get().FirstOrDefaultAsync(t => t.FilePath == fileName);
+            if (textFile is not null)
+            {
+                throw new Exception("File is already parsed.");
+            }
+
+            textFile = new TextFile
+            {
+                Id = Guid.NewGuid(),
+                FilePath = fileName,
+            };
+
+            await _unitOfWork.TextFiles.AddAsync(textFile);
+
+            var text = await File.ReadAllTextAsync(textFile.FilePath);
+            var punctuation = text.Where(char.IsPunctuation).ToArray();
+            var words = text.Split().Select(x => x.Trim(punctuation));
+
+            var wordFrequency = new Dictionary<string, int>();
+
+            foreach (var value in words)
+            {
+                wordFrequency.TryGetValue(value, out int count);
+                wordFrequency[value] = count + 1;
+            }
+
+            var newWords = new List<Word>();
+            var oldWords = new List<Word>();
+
+            foreach (var pair in wordFrequency)
+            {
+                var wordInDb = await _unitOfWork.Words.Get(w => w.Content == pair.Key).FirstOrDefaultAsync();
+                if (wordInDb == null)
+                {
+                    newWords.Add(new Word
+                    {
+                        Id = Guid.NewGuid(), 
+                        Content = pair.Key, 
+                        Frequency = pair.Value,
+                    });
+                }
+                else
+                {
+                    oldWords.Add(new Word
+                    {
+                        Id = wordInDb.Id,
+                        Content = wordInDb.Content,
+                        Frequency = wordInDb.Frequency + pair.Value,
+                    });
+                }
+            }
+
+            await _unitOfWork.Words.AddRangeAsync(newWords);
+            _unitOfWork.Words.UpdateRange(oldWords);
             await _unitOfWork.SaveChangesAsync();
         }
     }

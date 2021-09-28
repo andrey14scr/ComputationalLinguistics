@@ -42,23 +42,19 @@ namespace ComputationalLinguistics.Controllers
                 }
 
                 var path = Path.Combine("TextFiles", uploadedFile.FileName);
-                if (System.IO.File.Exists(path))
-                {
-                    return View("UserError", new UserErrorViewModel { Message = "Such file already exists"});
-                }
-
-                using (var fileStream = new FileStream(path, FileMode.Create))
-                {
-                    await uploadedFile.CopyToAsync(fileStream);
-                }
 
                 try
                 {
-                    await _textService.ParseText(path);
+                    using (var fileStream = new FileStream(path, FileMode.CreateNew))
+                    {
+                        await uploadedFile.CopyToAsync(fileStream);
+                    }
+
+                    await _textService.ParseTextSuper(path);
                 }
                 catch (Exception ex)
                 {
-                    return View("UserError", new UserErrorViewModel { Message = "Error while text processing", InnerMessages = new List<string>(ex.HResult)});
+                    return View("UserError", new UserErrorViewModel { Message = "Error while text processing", InnerMessages = new List<string>(){ ex.Message } });
                 }
             }
 
@@ -69,7 +65,7 @@ namespace ComputationalLinguistics.Controllers
         {
             var textFile = await _textService.GetById(id);
             var text = await System.IO.File.ReadAllTextAsync(textFile.FilePath);
-
+            var l = text.Length;
             var model = new TextFileInfoViewModel
             {
                 Text = text,
@@ -80,6 +76,7 @@ namespace ComputationalLinguistics.Controllers
             {
                 var seeks = await _wordService.GetUsages(wordId.Value, id);
                 model.Seeks = seeks;
+                model.Word = _wordService.GetById(wordId.Value).Result.Content;
             }
 
             return View(model);

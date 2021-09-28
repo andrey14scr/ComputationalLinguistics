@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using ComputationalLinguistics.DAL.Core;
 using ComputationalLinguistics.DAL.Core.Entities;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
 

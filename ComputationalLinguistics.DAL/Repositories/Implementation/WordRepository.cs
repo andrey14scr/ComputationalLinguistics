@@ -11,11 +11,14 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
         {
         }
 
-        public async Task UpdateFrequencyAsync(Word word)
+        public async Task<Word> GetByIdAsync(Guid id)
         {
-            var w = await _table.AsNoTracking().FirstAsync(w => w.Id == word.Id);
-            w.Frequency += word.Frequency;
-            _table.Update(w);
+            return await _table.AsNoTracking().FirstOrDefaultAsync(o => o.Id.Equals(id));
+        }
+
+        public async Task RemoveByIdAsync(Guid id)
+        {
+            _table.Remove(await GetByIdAsync(id));
         }
     }
 }

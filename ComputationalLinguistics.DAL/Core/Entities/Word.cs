@@ -2,12 +2,11 @@
 
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Linq;
 
 namespace ComputationalLinguistics.DAL.Core.Entities
 {
     [Index(nameof(Content), Name = "IContent")]
-    public class Word : IBaseEntity
+    public class Word
     {
         public Guid Id { get; set; }
         

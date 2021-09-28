@@ -5,11 +5,16 @@
     ViewData["Title"] = "Details";
 }
 
-<button if="nextWordBtn" onclick="findNextWord('@Html.Raw(JsonSerializer.Serialize(Model.Seeks))')">UPDATE</button>
+<button if="prevWordBtn" onclick="findWord('prev')">Prev</button>
+<button if="nextWordBtn" onclick="findWord('next')">Next</button>
 <h2>@Model.FileName</h2>
-<textarea id="text" name="textFile" style="width: 100%; height: 78vh;">@Model.Text</textarea>
+<textarea readonly class="form-control" id="text" name="textFile" style="width: 100%; height: 78vh;">@Model.Text</textarea>
 
 @section Scripts
 {
+    <script>
+        var indexes = @Html.Raw(JsonSerializer.Serialize(Model.Seeks));
+        var word = @Html.Raw(JsonSerializer.Serialize(Model.Word));
+    </script>
     <script src="~/js/wordsInText.js"></script>
 }
