@@ -1,0 +1,19 @@
+﻿@using ComputationalLinguistics.Controllers
+@model IEnumerable<ComputationalLinguistics.Core.Dto.WordDto>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td class="col-md-5">
+            @Html.DisplayFor(modelItem => item.Content)
+        </td>
+        <td class="col-md-1">
+            @Html.DisplayFor(modelItem => item.Frequency)
+        </td>
+        <td class="col-md-5">
+            <a asp-action="Details" asp-route-id="@item.Id"><input type="button" value="Описание" class="btn-info"/></a>
+            <a asp-action="Edit" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Редактировать" class="btn-secondary"/></a>
+            <a asp-action="Delete" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Удалить" class="btn-danger"/></a>
+        </td>
+    </tr>
+}

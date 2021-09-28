@@ -73,8 +73,10 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         {
             var textFile = _mapper.Map<TextFile>(textFileDto);
 
-            var wordsInText = await _unitOfWork.WordsInText.Get(wt => wt.TextFileId == textFile.Id)
-                .Select(w => w.Word).ToListAsync();
+            var wordsInText = await _unitOfWork.WordsInText
+                .Get(wt => wt.TextFileId == textFile.Id)
+                .Select(w => w.Word)
+                .ToListAsync();
             
             _unitOfWork.Words.RemoveRange(wordsInText);
             _unitOfWork.TextFiles.Remove(textFile);
@@ -92,7 +94,8 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             
             foreach (var textFileDto in textFileDtos)
             {
-                var wordsInText = await _unitOfWork.WordsInText.Get(wt => wt.TextFileId == textFileDto.Id)
+                var wordsInText = await _unitOfWork.WordsInText
+                    .Get(wt => wt.TextFileId == textFileDto.Id)
                     .Select(w => w.Word).ToListAsync();
             
                 _unitOfWork.Words.RemoveRange(wordsInText);
@@ -155,7 +158,8 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                             continue;
                         }
 
-                        var wordInList = oldWords.Find(w => w.Content == temp) ?? newWords.Find(w => w.Content == temp);
+                        var wordInList = oldWords.Find(w => w.Content == temp) 
+                                         ?? newWords.Find(w => w.Content == temp);
 
                         if (wordInList is null)
                         {

@@ -23,17 +23,17 @@ namespace ComputationalLinguistics.Controllers
             _mapper = mapper;
         }
 
-        public async Task<ActionResult> Index(string sortBy, string pattern)
+        public async Task<ActionResult> Index(string sortBy, string pattern, int wordsBlockSize)
         {
             var r = await _wordService.GetContextFiles(new Guid("d7b7283a-e1f7-46c0-82c4-222d80f84530"));
             IEnumerable<WordDto> words = new List<WordDto>();
 
             switch (sortBy)
             {
-                case WordsList.OnFrequency:
+                case WordsListViewModel.OnFrequency:
                     words = await _wordService.GetSortedBy(w => w.Frequency);
                     break;
-                case WordsList.OnPattern:
+                case WordsListViewModel.OnPattern:
                     if(!string.IsNullOrWhiteSpace(pattern))
                         words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern);
                     break;
@@ -45,7 +45,13 @@ namespace ComputationalLinguistics.Controllers
 
             var model = _mapper.Map<List<WordViewModel>>(words);
 
-            return View(new WordsList{Words = model, SortBy = sortBy, Pattern = pattern});
+            return View(new WordsListViewModel
+            {
+                Words = model, 
+                SortBy = sortBy, 
+                Pattern = pattern, 
+                WordsBlockSize = wordsBlockSize,
+            });
         }
 
         public async Task<ActionResult> Details(Guid? id)
@@ -148,6 +154,37 @@ namespace ComputationalLinguistics.Controllers
             await _wordService.Remove(wordDto);
 
             return RedirectToAction(nameof(Index));
+        }
+        
+        public async Task<ActionResult> List(string sortBy, string pattern, int skip, int next)
+        {
+            var r = await _wordService.GetContextFiles(new Guid("d7b7283a-e1f7-46c0-82c4-222d80f84530"));
+            IEnumerable<WordDto> words = new List<WordDto>();
+
+            switch (sortBy)
+            {
+                case WordsListViewModel.OnFrequency:
+                    words = await _wordService.GetSortedBy(w => w.Frequency);
+                    break;
+                case WordsListViewModel.OnPattern:
+                    if(!string.IsNullOrWhiteSpace(pattern))
+                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern);
+                    break;
+                default:
+                    words = await _wordService.GetSortedBy(w => w.Content, false);
+                    pattern = string.Empty;
+                    break;
+            }
+
+            var model = _mapper.Map<List<WordViewModel>>(words);
+
+            return View(new WordsListViewModel
+            {
+                Words = model, 
+                SortBy = sortBy, 
+                Pattern = pattern, 
+                WordsBlockSize = wordsBlockSize,
+            });
         }
 
         private async Task<bool> PersonExists(Guid id)

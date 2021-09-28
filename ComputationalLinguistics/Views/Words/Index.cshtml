@@ -1,5 +1,5 @@
 ﻿@using ComputationalLinguistics.Controllers
-@model WordsList
+@model WordsListViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -20,13 +20,13 @@
             </div>
             <div class="d-inline-flex p-2">
                 <select class="form-select" asp-for="SortBy" id="selectSort">
-                    <option value="@WordsList.OnAlphabet">Алфавиту</option>
-                    <option value="@WordsList.OnFrequency">Частоте</option>
-                    <option value="@WordsList.OnPattern">Шаблону</option>
+                    <option value="@WordsListViewModel.OnAlphabet">Алфавиту</option>
+                    <option value="@WordsListViewModel.OnFrequency">Частоте</option>
+                    <option value="@WordsListViewModel.OnPattern">Шаблону</option>
                 </select>
             </div>
 
-            @if (Model.SortBy == WordsList.OnPattern)
+            @if (Model.SortBy == WordsListViewModel.OnPattern)
             {
                 <div class="d-inline-flex p-2">
                     <input value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">
@@ -62,27 +62,31 @@
                 </tr>
             </thead>
         <tbody>
-        @foreach (var item in Model.Words)
-        {
-            <tr>
-                <td class="col-md-5">
-                    @Html.DisplayFor(modelItem => item.Content)
-                </td>
-                <td class="col-md-1">
-                    @Html.DisplayFor(modelItem => item.Frequency)
-                </td>
-                <td class="col-md-5">
-                    <a asp-action="Details" asp-route-id="@item.Id"><input type="button" value="Описание" class="btn-info"/></a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Редактировать" class="btn-secondary"/></a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Удалить" class="btn-danger"/></a>
-                </td>
-            </tr>
-        }
+            @foreach (var item in Model.Words)
+            {
+                <tr>
+                    <td class="col-md-5">
+                        @Html.DisplayFor(modelItem => item.Content)
+                    </td>
+                    <td class="col-md-1">
+                        @Html.DisplayFor(modelItem => item.Frequency)
+                    </td>
+                    <td class="col-md-5">
+                        <a asp-action="Details" asp-route-id="@item.Id"><input type="button" value="Описание" class="btn-info"/></a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Редактировать" class="btn-secondary"/></a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Удалить" class="btn-danger"/></a>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
 
+<button id="adding-words-btn" class="btn btn-primary col-sm-12 mt-4" onclick="c('@Model.Words.Count, @Model.WordsBlockSize')">
+    Загрузить следующие
+</button>
+
 @section Scripts
 {
-    <script src="~/js/sortForm.js"></script>
+    <script src="~/js/words.js"></script>
 }
