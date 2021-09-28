@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using ComputationalLinguistics.Core.Dto;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -50,7 +51,7 @@ namespace ComputationalLinguistics.Controllers
                         await uploadedFile.CopyToAsync(fileStream);
                     }
 
-                    await _textService.ParseTextSuper(path);
+                    await _textService.ParseText(path);
                 }
                 catch (Exception ex)
                 {
@@ -64,10 +65,17 @@ namespace ComputationalLinguistics.Controllers
         public async Task<IActionResult> Details(Guid id, Guid? wordId)
         {
             var textFile = await _textService.GetById(id);
+
+            if (textFile is null)
+            {
+                return View("UserError", new UserErrorViewModel { Message = "This text file doesn't exist"});
+            }
+            
             var text = await System.IO.File.ReadAllTextAsync(textFile.FilePath);
             var l = text.Length;
             var model = new TextFileInfoViewModel
             {
+                Id = id,
                 Text = text,
                 FileName = Path.GetFileName(textFile.FilePath),
             };
@@ -80,6 +88,39 @@ namespace ComputationalLinguistics.Controllers
             }
 
             return View(model);
+        }
+
+        public async Task<IActionResult> Delete(Guid? id)
+        {
+            if (id is null)
+            {
+                return NotFound();
+            }
+            var textFileDto = await _textService.GetById(id.Value);
+            
+            if (textFileDto == null)
+            {
+                return NotFound();
+            }
+
+            return View(new TextFileViewModel
+            {
+                Id = textFileDto.Id, 
+                FilePath = textFileDto.FilePath,
+            });
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> Delete(TextFileDto textFileDto)
+        {
+            if (textFileDto == null)
+            {
+                return NotFound();
+            }
+            
+            await _textService.Remove(textFileDto);
+            
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -35,14 +35,10 @@
     @switch (Model.PreviousPage)
     {
         case nameof(WordsController.Index):
-            <a asp-action="Index">
-                <input class="mt-2" type="button" value="Вернуться к списку"/>
-            </a>
+            <a asp-action="Index"><input class="mt-2" type="button" value="Вернуться к списку"/></a>
             break;
         case nameof(WordsController.Details):
-            <a asp-action="Details" asp-route-id="@Model.WordViewModel.Id">
-                <input class="mt-2" type="button" value="Вернуться к описанию"/>
-            </a>
+            <a asp-action="Details" asp-route-id="@Model.WordViewModel.Id"><input class="mt-2" type="button" value="Вернуться к описанию"/></a>
             break;
     }
 </div>

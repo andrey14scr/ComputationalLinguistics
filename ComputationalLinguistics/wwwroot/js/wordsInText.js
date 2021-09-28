@@ -22,6 +22,8 @@ function findWord(direction) {
 }
 
 function selectText(index, word) {
+    textFile.selectionStart = textFile.selectionEnd = index;
+    textFile.blur();
     textFile.focus();
     textFile.setSelectionRange(index, index + word.length);
 }

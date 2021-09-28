@@ -50,7 +50,7 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<ActionResult> Details(Guid? id)
         {
-            if (id == null)
+            if (id is null)
             {
                 return NotFound();
             }

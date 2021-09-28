@@ -1,0 +1,17 @@
+﻿@model TextFileViewModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Удаление</h1>
+<h3>Вы уверены, что хотите удалить текстовый файл <i>@System.IO.Path.GetFileName(Model.FilePath)</i>?</h3>
+<hr />
+
+<div>
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="@Model.Id" />
+        <input type="hidden" asp-for="@Model.FilePath" />
+        <input type="submit" value="Подтвердить" class="btn btn-danger"/>
+    </form>
+</div>
