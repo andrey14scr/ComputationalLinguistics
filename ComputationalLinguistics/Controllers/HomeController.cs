@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ComputationalLinguistics.Models;
 using ComputationalLinguistics.Core.Services.Interfaces;
+using ComputationalLinguistics.DAL;
+using Microsoft.EntityFrameworkCore;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -14,16 +16,22 @@ namespace ComputationalLinguistics.Controllers
         private readonly IWordService _wordService;
         private readonly ITextService _textService;
 
-        public HomeController(ILogger<HomeController> logger, IWordService wordService, ITextService textService)
+        private readonly ComputationalLinguisticsContext _context;
+
+        public HomeController(ILogger<HomeController> logger, IWordService wordService, ITextService textService, ComputationalLinguisticsContext context)
         {
             _logger = logger;
             _wordService = wordService;
             _textService = textService;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
-            await _textService.ParseText(@"D:\fff2.txt");
+            var lol = await _context.Words.AsNoTracking().FirstOrDefaultAsync(w => w.Content == "lol");
+            lol.Content = "asd";
+            _context.Words.Update(lol);
+            await _context.SaveChangesAsync();
 
             return View();
         }

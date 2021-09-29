@@ -23,7 +23,9 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
 
         public async Task<int> SaveChangesAsync()
         {
-            return await _context.SaveChangesAsync();
+            var res = await _context.SaveChangesAsync();
+            _context.ChangeTracker.Clear();
+            return res;
         }
 
         public void Dispose()

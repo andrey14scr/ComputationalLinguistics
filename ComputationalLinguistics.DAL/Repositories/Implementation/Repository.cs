@@ -29,6 +29,11 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
             return predicate is null ? _table.AsNoTracking() : _table.AsNoTracking().Where(predicate);
         }
 
+        public IQueryable<T> GetTracking(Expression<Func<T, bool>> predicate)
+        {
+            return predicate is null ? _table : _table.Where(predicate);
+        }
+
         public async Task AddAsync(T obj)
         {
             await _table.AddAsync(obj);

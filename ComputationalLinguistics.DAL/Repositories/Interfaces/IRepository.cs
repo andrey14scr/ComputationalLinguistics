@@ -10,6 +10,7 @@ namespace ComputationalLinguistics.DAL.Repositories.Interfaces
     {
         Task<IReadOnlyCollection<T>> GetAllAsync();
         IQueryable<T> Get(Expression<Func<T, bool>> predicate = null);
+        IQueryable<T> GetTracking(Expression<Func<T, bool>> predicate);
 
         Task AddAsync(T obj);
         Task AddRangeAsync(IEnumerable<T> objs);
