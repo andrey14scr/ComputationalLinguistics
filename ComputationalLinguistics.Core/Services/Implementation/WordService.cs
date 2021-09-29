@@ -103,6 +103,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         {
             var word = _mapper.Map<Word>(wordDto);
             var first = await GetById(wordDto.Id);
+
             var difference = wordDto.Content.Length - first.Content.Length;
 
             var textFiles = await _unitOfWork.WordsInText.Get()
@@ -118,29 +119,47 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
                 foreach (var textFile in textFiles)
                 {
+                    var text = await File.ReadAllTextAsync(textFile.FilePath);
+                    var ind = 0;
+                    var words = await _unitOfWork.WordsInText
+                        .Get(wt => wt.TextFileId == textFile.Id && wt.WordId == word.Id)
+                        .AsNoTracking()
+                        .ToListAsync();
+
+                    foreach (var w in words)
+                    {
+                        text = text.Remove(w.Seek + difference * ind, first.Content.Length)
+                            .Insert(w.Seek + difference * ind, word.Content);
+                        ind++;
+                    }
+
+                    await File.WriteAllTextAsync(textFile.FilePath, text);
+                    
                     var min = await _unitOfWork.WordsInText.Get(wt => wt.TextFileId == textFile.Id && wt.WordId == wordDto.Id)
                         .AsNoTracking()
                         .MinAsync(wt => wt.Seek);
-                    var wordsInTextToUpdate = await _unitOfWork.WordsInText.GetTracking(wt => wt.TextFileId == textFile.Id && wt.Seek > min)
+                    var wordsInTextToUpdate = await _unitOfWork.WordsInText
+                        .GetTracking(wt => wt.TextFileId == textFile.Id && wt.Seek > min)
                         .ToListAsync();
 
                     _unitOfWork.WordsInText.RemoveRange(wordsInTextToUpdate);
-                    //await _unitOfWork.SaveChangesAsync();
+                    await _unitOfWork.SaveChangesAsync();
 
+                    ind = 1;
                     foreach (var wordInText in wordsInTextToUpdate)
                     {
-                        wordInText.Seek += difference;
+                        wordInText.Seek += difference * ind;
+                        if (wordInText.WordId == word.Id)
+                        {
+                            ind++;
+                        }
                     }
 
                     toUpdate.AddRange(wordsInTextToUpdate);
-
-                    var text = await File.ReadAllTextAsync(textFile.FilePath);
-                    text = Regex.Replace(text, first.Content.ToLower(), word.Content, RegexOptions.IgnoreCase);
-                    await File.WriteAllTextAsync(textFile.FilePath, text);
                 }
 
                 await _unitOfWork.WordsInText.AddRangeAsync(toUpdate);
-                //await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
             }
             else
             {
@@ -153,7 +172,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             }
 
             var same = await _unitOfWork.Words.GetTracking(w => w.Content == wordDto.Content).FirstOrDefaultAsync();
-            
+
             if (same is not null)
             {
                 var sames = await _unitOfWork.WordsInText.GetTracking(wt => wt.WordId == same.Id).ToListAsync();
@@ -167,8 +186,9 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
                 word.Frequency += same.Frequency;
                 _unitOfWork.Words.Remove(same);
+                await _unitOfWork.SaveChangesAsync();
             }
-            
+
             _unitOfWork.Words.Update(word);
             await _unitOfWork.SaveChangesAsync();
         }
