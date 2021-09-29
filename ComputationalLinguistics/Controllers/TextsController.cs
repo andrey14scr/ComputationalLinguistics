@@ -33,29 +33,32 @@ namespace ComputationalLinguistics.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Add(IFormFile uploadedFile)
+        public async Task<IActionResult> Add(IFormFileCollection uploadedFiles)
         {
-            if (uploadedFile != null)
+            foreach (var uploadedFile in uploadedFiles)
             {
-                if (!Directory.Exists("TextFiles"))
+                if (uploadedFile != null)
                 {
-                    Directory.CreateDirectory("TextFiles");
-                }
-
-                var path = Path.Combine("TextFiles", uploadedFile.FileName);
-
-                try
-                {
-                    using (var fileStream = new FileStream(path, FileMode.CreateNew))
+                    if (!Directory.Exists("TextFiles"))
                     {
-                        await uploadedFile.CopyToAsync(fileStream);
+                        Directory.CreateDirectory("TextFiles");
                     }
 
-                    await _textService.ParseText(path);
-                }
-                catch (Exception ex)
-                {
-                    return View("UserError", new UserErrorViewModel { Message = "Error while text processing", InnerMessages = new List<string>(){ ex.Message } });
+                    var path = Path.Combine("TextFiles", uploadedFile.FileName);
+
+                    try
+                    {
+                        using (var fileStream = new FileStream(path, FileMode.CreateNew))
+                        {
+                            await uploadedFile.CopyToAsync(fileStream);
+                        }
+
+                        await _textService.ParseText(path);
+                    }
+                    catch (Exception ex)
+                    {
+                        return View("UserError", new UserErrorViewModel { Message = "Error while text processing", InnerMessages = new List<string>() { ex.Message } });
+                    }
                 }
             }
 

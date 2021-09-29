@@ -26,7 +26,7 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
 
         public IQueryable<T> Get(Expression<Func<T, bool>> predicate)
         {
-            return predicate is null ? _table.AsNoTracking() : _table.Where(predicate).AsNoTracking();
+            return predicate is null ? _table.AsNoTracking() : _table.AsNoTracking().Where(predicate);
         }
 
         public async Task AddAsync(T obj)

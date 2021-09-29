@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -98,6 +99,58 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         public async Task Update(WordDto wordDto)
         {
             var word = _mapper.Map<Word>(wordDto);
+            var first = await GetById(wordDto.Id);
+            var difference = wordDto.Content.Length - first.Content.Length;
+
+            if (false)
+            {
+                var wordsInTexts = _unitOfWork.WordsInText.Get();
+                var textFiles = await wordsInTexts.Where(wt => wt.WordId == wordDto.Id).Select(wt => wt.TextFile).Distinct().ToListAsync();
+                var toUpdate = new List<WordInText>();
+
+                foreach (var textFile in textFiles)
+                {
+                    var temp = wordsInTexts.Where(wt => wt.TextFileId == textFile.Id);
+                    var min = await temp.Where(wt => wt.WordId == wordDto.Id).MinAsync(wt => wt.Seek);
+                    var wordsInTextToUpdate = await temp.Where(wt => wt.Seek > min).AsNoTracking().ToListAsync();
+                    
+                    _unitOfWork.WordsInText.RemoveRange(wordsInTextToUpdate);
+                    await _unitOfWork.SaveChangesAsync();
+                    foreach (var wordInText in wordsInTextToUpdate)
+                    {
+                        wordInText.Seek += difference;
+                    }
+
+                    toUpdate.AddRange(wordsInTextToUpdate);
+
+                    var text = await File.ReadAllTextAsync(textFile.FilePath);
+                    text = text.Replace(first.Content, wordDto.Content);
+                    await File.WriteAllTextAsync(textFile.FilePath, text);
+                }
+
+                await _unitOfWork.WordsInText.AddRangeAsync(toUpdate);
+                await _unitOfWork.SaveChangesAsync();
+            }
+
+            var same = await _unitOfWork.Words.Get(w => w.Content == wordDto.Content).AsNoTracking().FirstOrDefaultAsync();
+            
+            if (same is not null)
+            {
+                var sames = await _unitOfWork.WordsInText.Get(wt => wt.WordId == same.Id).AsNoTracking().ToListAsync();
+
+                foreach (var s in sames)
+                {
+                    s.WordId = word.Id;
+                }
+
+                _unitOfWork.WordsInText.UpdateRange(sames);
+                await _unitOfWork.SaveChangesAsync();
+
+                word.Frequency += same.Frequency;
+                _unitOfWork.Words.Remove(same);
+                await _unitOfWork.SaveChangesAsync();
+            }
+            
             _unitOfWork.Words.Update(word);
             await _unitOfWork.SaveChangesAsync();
         }
