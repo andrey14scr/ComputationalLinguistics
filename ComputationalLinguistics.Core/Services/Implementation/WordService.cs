@@ -121,12 +121,11 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     var min = await _unitOfWork.WordsInText.Get(wt => wt.TextFileId == textFile.Id && wt.WordId == wordDto.Id)
                         .AsNoTracking()
                         .MinAsync(wt => wt.Seek);
-                    var wordsInTextToUpdate = await _unitOfWork.WordsInText.Get(wt => wt.TextFileId == textFile.Id && wt.Seek > min)
-                        .AsNoTracking()
+                    var wordsInTextToUpdate = await _unitOfWork.WordsInText.GetTracking(wt => wt.TextFileId == textFile.Id && wt.Seek > min)
                         .ToListAsync();
 
                     _unitOfWork.WordsInText.RemoveRange(wordsInTextToUpdate);
-                    await _unitOfWork.SaveChangesAsync();
+                    //await _unitOfWork.SaveChangesAsync();
 
                     foreach (var wordInText in wordsInTextToUpdate)
                     {
@@ -141,7 +140,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 }
 
                 await _unitOfWork.WordsInText.AddRangeAsync(toUpdate);
-                await _unitOfWork.SaveChangesAsync();
+                //await _unitOfWork.SaveChangesAsync();
             }
             else
             {
@@ -153,27 +152,21 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 }
             }
 
-            var same = await _unitOfWork.Words.Get(w => w.Content == wordDto.Content).FirstOrDefaultAsync();
+            var same = await _unitOfWork.Words.GetTracking(w => w.Content == wordDto.Content).FirstOrDefaultAsync();
             
             if (same is not null)
             {
-                var sames = await _unitOfWork.WordsInText.Get(wt => wt.WordId == same.Id).ToListAsync();
-
-                await _unitOfWork.SaveChangesAsync();
-                _unitOfWork.WordsInText.RemoveRange(sames);
-                await _unitOfWork.SaveChangesAsync();
+                var sames = await _unitOfWork.WordsInText.GetTracking(wt => wt.WordId == same.Id).ToListAsync();
 
                 foreach (var s in sames)
                 {
                     s.WordId = word.Id;
                 }
 
-                await _unitOfWork.WordsInText.AddRangeAsync(sames);
-                await _unitOfWork.SaveChangesAsync();
+                _unitOfWork.WordsInText.UpdateRange(sames);
 
                 word.Frequency += same.Frequency;
                 _unitOfWork.Words.Remove(same);
-                await _unitOfWork.SaveChangesAsync();
             }
             
             _unitOfWork.Words.Update(word);

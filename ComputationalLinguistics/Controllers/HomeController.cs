@@ -28,9 +28,8 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var lol = await _context.Words.AsNoTracking().FirstOrDefaultAsync(w => w.Content == "lol");
-            lol.Content = "asd";
-            _context.Words.Update(lol);
+            var lol = await _context.Words.FirstOrDefaultAsync(w => w.Content == "lol");
+            _context.Words.Remove(lol);
             await _context.SaveChangesAsync();
 
             return View();
