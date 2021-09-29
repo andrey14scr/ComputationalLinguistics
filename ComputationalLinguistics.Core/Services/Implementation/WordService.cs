@@ -90,11 +90,11 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             return _mapper.Map<List<WordDto>>(words);
         }
 
-        public async Task<IEnumerable<WordDto>> SortBy(Expression<Func<Word, bool>> predicate, int skip, int take)
+        public async Task<IEnumerable<WordDto>> SortBy<T>(Expression<Func<Word, bool>> predicate,Expression<Func<Word, T>> keySelector, int skip, int take)
         {
             var words = new List<Word>();
             
-            words = await _unitOfWork.Words.Get(predicate).Skip(skip).Take(take).ToListAsync();
+            words = await _unitOfWork.Words.Get(predicate).OrderBy(keySelector).Skip(skip).Take(take).ToListAsync();
             
             return _mapper.Map<List<WordDto>>(words);
         }
@@ -166,8 +166,15 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 foreach (var textFile in textFiles)
                 {
                     var text = await File.ReadAllTextAsync(textFile.FilePath);
-                    text = text.Replace(first.Content, wordDto.Content);
-                    await File.WriteAllTextAsync(textFile.FilePath, text);
+                    var words = await _unitOfWork.WordsInText
+                        .Get(wt => wt.TextFileId == textFile.Id && wt.WordId == word.Id)
+                        .AsNoTracking()
+                        .ToListAsync();
+
+                    foreach (var w in words)
+                    {
+                        text = text.Remove(w.Seek, first.Content.Length).Insert(w.Seek, word.Content);
+                    }
                 }
             }
 

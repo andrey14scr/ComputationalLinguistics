@@ -37,9 +37,15 @@ namespace ComputationalLinguistics.Controllers
                 case Variables.OnFrequencyPattern:
                     words = await _wordService.GetSortedBy(w => w.Frequency, 0, wordsBlockSize);
                     break;
+                case Variables.OnFrequencyBackPattern:
+                    words = await _wordService.GetSortedBy(w => w.Frequency, 0, wordsBlockSize, false);
+                    break;
                 case Variables.OnPatternPattern:
                     if(!string.IsNullOrWhiteSpace(pattern))
-                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern, 0, wordsBlockSize);
+                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern, w => w.Content, 0, wordsBlockSize);
+                    break;
+                case Variables.OnAlphabetBackPattern:
+                    words = await _wordService.GetSortedBy(w => w.Content, 0, wordsBlockSize);
                     break;
                 default:
                     words = await _wordService.GetSortedBy(w => w.Content, 0, wordsBlockSize, false);
@@ -169,9 +175,15 @@ namespace ComputationalLinguistics.Controllers
                 case Variables.OnFrequencyPattern:
                     words = await _wordService.GetSortedBy(w => w.Frequency, skip, next);
                     break;
+                case Variables.OnFrequencyBackPattern:
+                    words = await _wordService.GetSortedBy(w => w.Frequency, skip, next, false);
+                    break;
                 case Variables.OnPatternPattern:
                     if(!string.IsNullOrWhiteSpace(pattern))
-                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern, skip, next);
+                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern, w => w.Content, skip, next);
+                    break;
+                case Variables.OnAlphabetBackPattern:
+                    words = await _wordService.GetSortedBy(w => w.Content, skip, next);
                     break;
                 default:
                     words = await _wordService.GetSortedBy(w => w.Content, skip, next, false);

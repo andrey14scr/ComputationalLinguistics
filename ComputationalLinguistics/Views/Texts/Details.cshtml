@@ -5,8 +5,12 @@
     ViewData["Title"] = "Details";
 }
 
-<button if="prevWordBtn" onclick="findWord('prev')">Prev</button>
-<button if="nextWordBtn" onclick="findWord('next')">Next</button>
+@if (!string.IsNullOrWhiteSpace(Model.Word))
+{
+    <button if="prevWordBtn" onclick="findWord('prev')">Пред.</button>
+    <span> <i> @Model.Word </i> </span>
+    <button if="nextWordBtn" onclick="findWord('next')">След.</button>   
+}
 <h2>@Model.FileName</h2>
 <textarea readonly class="form-control" id="text" name="textFile" style="width: 100%; height: 78vh;">@Model.Text</textarea>
 

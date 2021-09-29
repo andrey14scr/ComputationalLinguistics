@@ -21,8 +21,10 @@
             </div>
             <div class="d-inline-flex p-2">
                 <select class="form-select" asp-for="SortBy" id="selectSort">
-                    <option value="@Variables.OnAlphabetPattern">Алфавиту</option>
-                    <option value="@Variables.OnFrequencyPattern">Частоте</option>
+                    <option value="@Variables.OnAlphabetPattern">Алфавиту ↓</option>
+                    <option value="@Variables.OnAlphabetBackPattern">Алфавиту ↑</option>
+                    <option value="@Variables.OnFrequencyPattern">Частоте ↑</option>
+                    <option value="@Variables.OnFrequencyBackPattern">Частоте ↓</option>
                     <option value="@Variables.OnPatternPattern">Шаблону</option>
                 </select>
             </div>
