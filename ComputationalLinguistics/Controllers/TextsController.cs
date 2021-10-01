@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using AutoMapper;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.Models;
@@ -7,9 +8,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using ComputationalLinguistics.Core.Dto;
+using Microsoft.Extensions.Configuration;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -35,7 +39,21 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<IActionResult> Add(IFormFileCollection uploadedFiles)
         {
-            foreach (var uploadedFile in uploadedFiles)
+            var errors = new ConcurrentBag<string>();
+            var exceptions = new ConcurrentBag<Exception>();
+            var toUpdate = new ConcurrentBag<WordDto>();
+            var wordsInTexts = new ConcurrentBag<WordInTextDto>();
+
+            var builder = new ConfigurationBuilder();
+            builder.SetBasePath(Directory.GetCurrentDirectory());
+            builder.AddJsonFile("appsettings.json");
+            var config = builder.Build();
+            var connectionString = config.GetConnectionString("DefaultConnection");
+
+            var sw = new Stopwatch();
+            sw.Start();
+            
+            var tasks = uploadedFiles.Select(async uploadedFile =>
             {
                 if (uploadedFile != null)
                 {
@@ -46,21 +64,32 @@ namespace ComputationalLinguistics.Controllers
 
                     var path = Path.Combine("TextFiles", uploadedFile.FileName);
 
+                    if (System.IO.File.Exists(path))
+                    {
+                        path = Path.Combine("TextFiles", $"Copy_{DateTime.Now:MM/dd/yyyy_HH/mm/ss}_",
+                            uploadedFile.FileName);
+                    }
+
                     try
                     {
-                        using (var fileStream = new FileStream(path, FileMode.CreateNew))
+                        await using (var fileStream = new FileStream(path, FileMode.CreateNew))
                         {
                             await uploadedFile.CopyToAsync(fileStream);
                         }
 
-                        await _textService.ParseText(path);
+                        await _textService.ParseText(connectionString, path, toUpdate, wordsInTexts);
                     }
                     catch (Exception ex)
                     {
-                        return View("UserError", new UserErrorViewModel { Message = "Error while text processing", InnerMessages = new List<string>() { ex.Message } });
+                        exceptions.Add(ex);
                     }
                 }
-            }
+            });
+            await Task.WhenAll(tasks);
+            
+            sw.Stop();
+            var r = sw.ElapsedMilliseconds;
+            await System.IO.File.WriteAllTextAsync($"Time_{DateTime.Now:MM/dd/yyyy_HH/mm/ss}.txt", r.ToString());
 
             return RedirectToAction("Index");
         }

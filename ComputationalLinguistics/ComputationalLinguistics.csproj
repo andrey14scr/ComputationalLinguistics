@@ -21,7 +21,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ComputationalLinguistics.Core\ComputationalLinguistics.Core.csproj" />
-      <ProjectReference Include="..\ComputationalLinguistics.DAL\ComputationalLinguistics.DAL.csproj" />
     </ItemGroup>
 
     <ItemGroup>

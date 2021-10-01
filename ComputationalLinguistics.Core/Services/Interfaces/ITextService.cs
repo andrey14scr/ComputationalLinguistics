@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using ComputationalLinguistics.Core.Dto;
 
@@ -8,8 +9,8 @@ namespace ComputationalLinguistics.Core.Services.Interfaces
     {
         Task<TextFileDto> GetById(Guid id);
 
-        Task ParseTextSuper(string fileName);
+        Task ParseText(string connectionString, string fileName, ConcurrentBag<WordDto> toUpdate, ConcurrentBag<WordInTextDto> wordsInTextToUpdate);
+
         Task<bool> Exists(string path);
-        Task ParseText(string fileName);
     }
 }
