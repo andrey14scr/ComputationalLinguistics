@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics.DA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics.Core", "ComputationalLinguistics.Core\ComputationalLinguistics.Core.csproj", "{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncSync", "AsyncSync\AsyncSync.csproj", "{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
