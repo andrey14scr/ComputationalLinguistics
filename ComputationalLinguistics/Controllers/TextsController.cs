@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using AutoMapper;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.Models;
@@ -8,12 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using ComputationalLinguistics.Core.Dto;
-using Microsoft.Extensions.Configuration;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -22,6 +18,7 @@ namespace ComputationalLinguistics.Controllers
         private readonly ITextService _textService;
         private readonly IWordService _wordService;
         private readonly IMapper _mapper;
+        private const string TextFilesFolder = "TextFiles";
 
         public TextsController(ITextService textService, IMapper mapper, IWordService wordService)
         {
@@ -39,35 +36,22 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<IActionResult> Add(IFormFileCollection uploadedFiles)
         {
-            var errors = new ConcurrentBag<string>();
-            var exceptions = new ConcurrentBag<Exception>();
-            var toUpdate = new ConcurrentBag<WordDto>();
-            var wordsInTexts = new ConcurrentBag<WordInTextDto>();
+            var exceptions = new List<Exception>();
 
-            var builder = new ConfigurationBuilder();
-            builder.SetBasePath(Directory.GetCurrentDirectory());
-            builder.AddJsonFile("appsettings.json");
-            var config = builder.Build();
-            var connectionString = config.GetConnectionString("DefaultConnection");
-
-            var sw = new Stopwatch();
-            sw.Start();
-            
-            var tasks = uploadedFiles.Select(async uploadedFile =>
+            if (!Directory.Exists(TextFilesFolder))
             {
-                if (uploadedFile != null)
-                {
-                    if (!Directory.Exists("TextFiles"))
-                    {
-                        Directory.CreateDirectory("TextFiles");
-                    }
+                Directory.CreateDirectory(TextFilesFolder);
+            }
 
-                    var path = Path.Combine("TextFiles", uploadedFile.FileName);
+            foreach (var uploadedFile in uploadedFiles)
+            {
+                if (uploadedFile is not null)
+                {
+                    var path = Path.Combine(TextFilesFolder, uploadedFile.FileName);
 
                     if (System.IO.File.Exists(path))
                     {
-                        path = Path.Combine("TextFiles", $"Copy_{DateTime.Now:MM/dd/yyyy_HH/mm/ss}_",
-                            uploadedFile.FileName);
+                        path = Path.Combine(TextFilesFolder, $"Copy_{DateTime.Now:MM/dd/yyyy_HH/mm/ss}_", uploadedFile.FileName);
                     }
 
                     try
@@ -77,21 +61,50 @@ namespace ComputationalLinguistics.Controllers
                             await uploadedFile.CopyToAsync(fileStream);
                         }
 
-                        await _textService.ParseText(connectionString, path, toUpdate, wordsInTexts);
+                        await _textService.ParseText(path);
                     }
                     catch (Exception ex)
                     {
                         exceptions.Add(ex);
                     }
                 }
-            });
-            await Task.WhenAll(tasks);
-            
-            sw.Stop();
-            var r = sw.ElapsedMilliseconds;
-            await System.IO.File.WriteAllTextAsync($"Time_{DateTime.Now:MM/dd/yyyy_HH/mm/ss}.txt", r.ToString());
+            }
 
             return RedirectToAction("Index");
+        }
+
+        public async Task ParseText(IFormFile uploadedFile)
+        {
+            var exceptions = new List<Exception>();
+
+            if (!Directory.Exists(TextFilesFolder))
+            {
+                Directory.CreateDirectory(TextFilesFolder);
+            }
+
+            if (uploadedFile is not null)
+            {
+                var path = Path.Combine(TextFilesFolder, uploadedFile.FileName);
+
+                if (System.IO.File.Exists(path))
+                {
+                    path = Path.Combine(TextFilesFolder, $"Copy_{DateTime.Now:MM/dd/yyyy_HH/mm/ss}_", uploadedFile.FileName);
+                }
+
+                try
+                {
+                    await using (var fileStream = new FileStream(path, FileMode.CreateNew))
+                    {
+                        await uploadedFile.CopyToAsync(fileStream);
+                    }
+
+                    await _textService.ParseText(path);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
         }
 
         public async Task<IActionResult> Details(Guid id, Guid? wordId)

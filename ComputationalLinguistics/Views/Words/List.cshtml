@@ -1,5 +1,5 @@
 ﻿@using ComputationalLinguistics.Controllers
-@model IEnumerable<ComputationalLinguistics.Core.Dto.WordDto>
+@model IEnumerable<WordViewModel>
 
 @{
     Layout = null;
@@ -9,10 +9,10 @@
 {
     <tr>
         <td class="col-md-5">
-            @Html.DisplayFor(modelItem => item.Content)
+            @item.Content
         </td>
         <td class="col-md-1">
-            @Html.DisplayFor(modelItem => item.Frequency)
+            @item.Frequency
         </td>
         <td class="col-md-5">
             <a asp-action="Details" asp-route-id="@item.Id"><input type="button" value="Описание" class="btn-info" /></a>

@@ -10,13 +10,15 @@ namespace ComputationalLinguistics.Core.Services.Interfaces
 {
     public interface IWordService : IService<WordDto>
     {
-        Task<WordDto> GetById(Guid id);
+        Task<IEnumerable<WordWithFrequencyDto>> GetSortedBy<T>(Expression<Func<Word, T>> keySelector, int skip, int take, bool isDesc = true);
+        Task<IEnumerable<WordWithFrequencyDto>> GetSortedByFrequency(int skip, int take, bool isDesc = true);
 
-        Task<IEnumerable<WordDto>> GetSortedBy<T>(Expression<Func<Word, T>> keySelector, int skip, int take, bool isDesc = true);
-
-        Task<IEnumerable<WordDto>> SortBy<T>(Expression<Func<Word, bool>> predicate,
+        Task<IEnumerable<WordWithFrequencyDto>> SortBy<T>(Expression<Func<Word, bool>> predicate,
             Expression<Func<Word, T>> keySelector, int skip, int take);
         Task<IEnumerable<WordContextFile>> GetContextFiles(Guid id);
         Task<IEnumerable<int>> GetUsages(Guid wordId, Guid textFileId);
+        Task<int> GetFrequency(Guid wordId);
+
+        Task AddNewWords(List<WordDto> toAdd, List<WordInTextDto> wordsInTextToAdd);
     }
 }

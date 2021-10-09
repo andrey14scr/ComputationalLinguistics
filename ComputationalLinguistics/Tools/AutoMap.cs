@@ -11,9 +11,13 @@ namespace ComputationalLinguistics.Tools
         {
             CreateMap<WordDto, Word>().ReverseMap();
             CreateMap<WordDto, WordViewModel>().ReverseMap();
+            CreateMap<WordDto, WordWithFrequencyDto>().ReverseMap();
+            CreateMap<WordViewModel, WordWithFrequencyDto>().ReverseMap();
 
             CreateMap<TextFileDto, TextFile>().ReverseMap();
             CreateMap<TextFileDto, TextFileViewModel>().ReverseMap();
+
+            CreateMap<WordInTextDto, WordInText>().ReverseMap();
         }
     }
 }

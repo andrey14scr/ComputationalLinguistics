@@ -9,8 +9,9 @@ namespace ComputationalLinguistics.DAL.Repositories.Interfaces
     public interface IRepository<T> : IDisposable where T : class
     {
         Task<IReadOnlyCollection<T>> GetAllAsync();
-        IQueryable<T> Get(Expression<Func<T, bool>> predicate = null);
-        IQueryable<T> GetTracking(Expression<Func<T, bool>> predicate);
+        IQueryable<T> GetNoTracking();
+        IQueryable<T> GetNoTrackingWhere(Expression<Func<T, bool>> predicate);
+        IQueryable<T> GetTrackingWhere(Expression<Func<T, bool>> predicate);
 
         Task AddAsync(T obj);
         Task AddRangeAsync(IEnumerable<T> objs);

@@ -1,5 +1,3 @@
-using System;
-
 namespace ComputationalLinguistics.Models
 {
     public class ErrorViewModel

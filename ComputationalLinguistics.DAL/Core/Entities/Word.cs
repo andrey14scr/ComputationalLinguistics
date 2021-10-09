@@ -12,7 +12,5 @@ namespace ComputationalLinguistics.DAL.Core.Entities
         
         [Column(TypeName = "nvarchar(120)")]
         public string Content { get; set; }
-        
-        public int Frequency { get; set; }
     }
 }

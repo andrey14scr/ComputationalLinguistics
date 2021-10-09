@@ -24,12 +24,17 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
             return await _table.AsNoTracking().ToListAsync();
         }
 
-        public IQueryable<T> Get(Expression<Func<T, bool>> predicate)
+        public IQueryable<T> GetNoTracking()
+        {
+            return _table.AsNoTracking();
+        }
+
+        public IQueryable<T> GetNoTrackingWhere(Expression<Func<T, bool>> predicate)
         {
             return predicate is null ? _table.AsNoTracking() : _table.AsNoTracking().Where(predicate);
         }
 
-        public IQueryable<T> GetTracking(Expression<Func<T, bool>> predicate)
+        public IQueryable<T> GetTrackingWhere(Expression<Func<T, bool>> predicate)
         {
             return predicate is null ? _table : _table.Where(predicate);
         }

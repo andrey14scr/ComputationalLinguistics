@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using ComputationalLinguistics.Core.Dto;
@@ -30,30 +29,7 @@ namespace ComputationalLinguistics.Controllers
                 wordsBlockSize = Variables.WordsBlockSize;
             }
 
-            IEnumerable<WordDto> words = new List<WordDto>();
-
-            switch (sortBy)
-            {
-                case Variables.OnFrequencyPattern:
-                    words = await _wordService.GetSortedBy(w => w.Frequency, 0, wordsBlockSize);
-                    break;
-                case Variables.OnFrequencyBackPattern:
-                    words = await _wordService.GetSortedBy(w => w.Frequency, 0, wordsBlockSize, false);
-                    break;
-                case Variables.OnPatternPattern:
-                    if(!string.IsNullOrWhiteSpace(pattern))
-                        words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern, w => w.Content, 0, wordsBlockSize);
-                    break;
-                case Variables.OnAlphabetBackPattern:
-                    words = await _wordService.GetSortedBy(w => w.Content, 0, wordsBlockSize);
-                    break;
-                default:
-                    words = await _wordService.GetSortedBy(w => w.Content, 0, wordsBlockSize, false);
-                    pattern = string.Empty;
-                    break;
-            }
-
-            var model = _mapper.Map<List<WordViewModel>>(words);
+            var model = await GetWordViewModels(sortBy, pattern, 0, wordsBlockSize);
 
             return View(new WordsListViewModel
             {
@@ -64,7 +40,7 @@ namespace ComputationalLinguistics.Controllers
             });
         }
 
-        public async Task<ActionResult> Details(Guid? id)
+        public async Task<ActionResult> Details(Guid? id, int frequency = 0)
         {
             if (id is null)
             {
@@ -81,6 +57,7 @@ namespace ComputationalLinguistics.Controllers
 
             var model = _mapper.Map<WordViewModel>(word);
             model.WordContextFiles = contextFiles;
+            model.Frequency = frequency;
 
             return View(model);
         }
@@ -103,7 +80,6 @@ namespace ComputationalLinguistics.Controllers
                     {
                         Id = Guid.NewGuid(),
                         Content = createWordModel.Content,
-                        Frequency = 0,
                     };
                     await _wordService.Add(wordDto);
                     return RedirectToAction(nameof(Index));
@@ -140,7 +116,8 @@ namespace ComputationalLinguistics.Controllers
             {
                 await _wordService.Update(new WordDto
                 {
-                    Id = wvm.WordViewModel.Id, Content = wvm.WordViewModel.Content, Frequency = wvm.WordViewModel.Frequency
+                    Id = wvm.WordViewModel.Id, 
+                    Content = wvm.WordViewModel.Content,
                 });
 
                 return RedirectToAction(nameof(Index));
@@ -168,15 +145,22 @@ namespace ComputationalLinguistics.Controllers
         
         public async Task<ActionResult> List(string sortBy, string pattern, int skip, int next)
         {
-            IEnumerable<WordDto> words = new List<WordDto>();
+            var model = await GetWordViewModels(sortBy, pattern, skip, next);
+
+            return View(model);
+        }
+
+        private async Task<List<WordViewModel>> GetWordViewModels(string sortBy, string pattern, int skip, int next)
+        {
+            IEnumerable<WordWithFrequencyDto> words = new List<WordWithFrequencyDto>();
 
             switch (sortBy)
             {
                 case Variables.OnFrequencyPattern:
-                    words = await _wordService.GetSortedBy(w => w.Frequency, skip, next);
+                    words = await _wordService.GetSortedByFrequency(skip, next);
                     break;
                 case Variables.OnFrequencyBackPattern:
-                    words = await _wordService.GetSortedBy(w => w.Frequency, skip, next, false);
+                    words = await _wordService.GetSortedByFrequency(skip, next, false);
                     break;
                 case Variables.OnPatternPattern:
                     if(!string.IsNullOrWhiteSpace(pattern))
@@ -189,8 +173,8 @@ namespace ComputationalLinguistics.Controllers
                     words = await _wordService.GetSortedBy(w => w.Content, skip, next, false);
                     break;
             }
-            
-            return View(words);
+
+            return _mapper.Map<List<WordViewModel>>(words);
         }
     }
 }

@@ -45,7 +45,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
         public async Task<bool> Exists(string path)
         {
-            return await _unitOfWork.TextFiles.Get().AnyAsync(f => f.FilePath == path);
+            return await _unitOfWork.TextFiles.GetNoTracking().AnyAsync(f => f.FilePath == path);
         }
 
         public async Task Add(TextFileDto textFileDto)
@@ -74,7 +74,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             var textFile = _mapper.Map<TextFile>(textFileDto);
 
             var wordsInText = await _unitOfWork.WordsInText
-                .Get(wt => wt.TextFileId == textFile.Id)
+                .GetNoTrackingWhere(wt => wt.TextFileId == textFile.Id)
                 .Select(w => w.Word)
                 .ToListAsync();
             
@@ -95,7 +95,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             foreach (var textFileDto in textFileDtos)
             {
                 var wordsInText = await _unitOfWork.WordsInText
-                    .Get(wt => wt.TextFileId == textFileDto.Id)
+                    .GetNoTrackingWhere(wt => wt.TextFileId == textFileDto.Id)
                     .Select(w => w.Word).ToListAsync();
             
                 _unitOfWork.Words.RemoveRange(wordsInText);
@@ -110,131 +110,12 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task ParseText(string connectionString, string fileName, ConcurrentBag<WordDto> toUpdate, ConcurrentBag<WordInTextDto> wordsInTextToUpdate)
+        public async Task ParseText(string fileName)
         {
-            var options = new DbContextOptionsBuilder<ComputationalLinguisticsContext>().UseSqlServer(connectionString).Options;
-
-            await using (var context = new ComputationalLinguisticsContext(options))
-            {
-                var text = await context.TextFiles.AsNoTracking().FirstOrDefaultAsync(t => t.FilePath == fileName);
-                if (text is not null)
-                {
-                    throw new Exception($"File {Path.GetFileName(fileName)} is already parsed");
-                }
-
-                text = new TextFile
-                {
-                    Id = Guid.NewGuid(),
-                    FilePath = fileName,
-                };
-                var textId = text.Id;
-
-                await context.TextFiles.AddAsync(text);
-                await context.SaveChangesAsync();
-
-                var sb = new StringBuilder();
-                var newWords = new List<Word>();
-                var oldWords = new List<Word>();
-                var wordsInTextToAdd = new List<WordInText>();
-                WordInText wordInTextToAdd = null;
-                var position = 0;
-
-                using (var sr = new StreamReader(fileName))
-                {
-                    while (sr.Peek() >= 0)
-                    {
-                        var next = (char)sr.Read();
-
-                        if (next != '\r')
-                        {
-                            position++;
-                        }
-
-                        if (!char.IsPunctuation(next) && next != ' ' && next != '\n')
-                        {
-                            sb.Append(next);
-                        }
-                        else
-                        {
-                            var temp = sb.ToString().Trim(' ', '\r', '\n').ToLower();
-
-                            if (string.IsNullOrWhiteSpace(temp) || !char.IsLetter(temp[0]))
-                            {
-                                sb.Clear();
-                                continue;
-                            }
-
-                            var wordInList = oldWords.Find(w => w.Content == temp)
-                                             ?? newWords.Find(w => w.Content == temp);
-
-                            if (wordInList is null)
-                            {
-                                var wordInDb = await context.Words.Where(w => w.Content == temp).AsNoTracking()
-                                    .FirstOrDefaultAsync();
-                                if (wordInDb is null)
-                                {
-                                    wordInList = new Word
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Content = temp,
-                                        Frequency = 1,
-                                    };
-                                    newWords.Add(wordInList);
-
-                                    wordInTextToAdd = new WordInText
-                                    {
-                                        Seek = position - temp.Length - 1,
-                                        TextFileId = textId,
-                                        WordId = wordInList.Id,
-                                    };
-                                    wordsInTextToAdd.Add(wordInTextToAdd);
-                                }
-                                else
-                                {
-                                    wordInList = new Word
-                                    {
-                                        Id = wordInDb.Id,
-                                        Content = temp,
-                                        Frequency = wordInDb.Frequency + 1,
-                                    };
-                                    oldWords.Add(wordInList);
-                                    toUpdate.Add(_mapper.Map<WordDto>(wordInList));
-                                }
-                            }
-                            else
-                            {
-                                wordInList.Frequency++;
-                            }
-
-                            if (wordInTextToAdd is null)
-                            {
-                                wordsInTextToUpdate.Add(new WordInTextDto
-                                {
-                                    Seek = position - temp.Length - 1,
-                                    TextFileId = textId,
-                                    WordId = wordInList.Id,
-                                });
-                            }
-
-                            wordInTextToAdd = null;
-
-                            sb.Clear();
-                        }
-                    }
-                }
-
-                await context.Words.AddRangeAsync(newWords);
-                await context.WordsInText.AddRangeAsync(wordsInTextToAdd);
-                await context.SaveChangesAsync();
-            }
-        }
-
-        private async Task ParseTextSuper(string fileName)
-        {
-            var textFile = await _unitOfWork.TextFiles.Get().FirstOrDefaultAsync(t => t.FilePath == fileName);
+            var textFile = await _unitOfWork.TextFiles.GetNoTracking().FirstOrDefaultAsync(t => t.FilePath == fileName);
             if (textFile is not null)
             {
-                throw new Exception("File is already parsed.");
+                throw new Exception($"File {Path.GetFileName(fileName)} is already parsed");
             }
 
             textFile = new TextFile
@@ -243,46 +124,92 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 FilePath = fileName,
             };
 
-            await _unitOfWork.TextFiles.AddAsync(textFile);
-
-            var text = await File.ReadAllTextAsync(textFile.FilePath);
-            var punctuation = text.Where(char.IsPunctuation).ToArray();
-            var words = text.Split().Select(x => x.Trim(punctuation));
-
-            var wordFrequency = new Dictionary<string, int>();
-
-            foreach (var value in words)
-            {
-                wordFrequency.TryGetValue(value, out int count);
-                wordFrequency[value] = count + 1;
-            }
-
+            var textId = textFile.Id;
+            var sb = new StringBuilder();
             var newWords = new List<Word>();
             var oldWords = new List<Word>();
+            var wordsInText = new List<WordInText>();
+            var position = 0;
 
-            foreach (var pair in wordFrequency)
+            using (var sr = new StreamReader(fileName))
             {
-                var wordInDb = await _unitOfWork.Words.Get(w => w.Content == pair.Key).FirstOrDefaultAsync();
-                if (wordInDb == null)
+                while (sr.Peek() >= 0)
                 {
-                    newWords.Add(new Word
+                    var next = (char)sr.Read();
+
+                    if (next != '\r')
                     {
-                        Id = Guid.NewGuid(), 
-                        Content = pair.Key, 
-                        Frequency = pair.Value,
-                    });
-                }
-                else
-                {
-                    oldWords.Add(new Word
+                        position++;
+                    }
+
+                    if (!char.IsPunctuation(next) && next != ' ' && next != '\n')
                     {
-                        Id = wordInDb.Id,
-                        Content = wordInDb.Content,
-                        Frequency = wordInDb.Frequency + pair.Value,
-                    });
+                        sb.Append(next);
+                    }
+                    else
+                    {
+                        var temp = sb.ToString().Trim(' ', '\r', '\n').ToLower();
+
+                        if (string.IsNullOrWhiteSpace(temp) || !char.IsLetter(temp[0]))
+                        {
+                            sb.Clear();
+                            continue;
+                        }
+
+                        var wordInList = oldWords.Find(w => w.Content == temp)
+                                         ?? newWords.Find(w => w.Content == temp);
+
+                        if (wordInList is null)
+                        {
+                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == temp)
+                                .FirstOrDefaultAsync();
+                            if (wordInDb is null)
+                            {
+                                newWords.Add(new Word
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = temp,
+                                });
+                                wordsInText.Add(new WordInText
+                                {
+                                    Seek = position - temp.Length - 1,
+                                    TextFileId = textId,
+                                    WordId = newWords[^1].Id,
+                                });
+                            }
+                            else
+                            {
+                                oldWords.Add(new Word
+                                {
+                                    Id = wordInDb.Id,
+                                    Content = temp,
+                                });
+
+                                wordsInText.Add(new WordInText
+                                {
+                                    Seek = position - temp.Length - 1,
+                                    TextFileId = textId,
+                                    WordId = wordInDb.Id,
+                                });
+                            }
+                        }
+                        else
+                        {
+                            wordsInText.Add(new WordInText
+                            {
+                                Seek = position - temp.Length - 1,
+                                TextFileId = textId,
+                                WordId = wordInList.Id,
+                            });
+                        }
+
+                        sb.Clear();
+                    }
                 }
             }
 
+            await _unitOfWork.TextFiles.AddAsync(textFile);
+            await _unitOfWork.WordsInText.AddRangeAsync(wordsInText);
             await _unitOfWork.Words.AddRangeAsync(newWords);
             _unitOfWork.Words.UpdateRange(oldWords);
             await _unitOfWork.SaveChangesAsync();

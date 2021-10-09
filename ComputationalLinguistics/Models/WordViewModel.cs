@@ -8,7 +8,7 @@ namespace ComputationalLinguistics.Models
     {
         public Guid Id { get; set; }
         public string Content { get; set; }
-        public int Frequency { get; set; }
         public IEnumerable<WordContextFile> WordContextFiles { get; set; }
+        public int Frequency { get; set; }
     }
 }
