@@ -18,6 +18,8 @@ namespace ComputationalLinguistics.Core.Services.Interfaces
         Task<IEnumerable<WordContextFile>> GetContextFiles(Guid id);
         Task<IEnumerable<int>> GetUsages(Guid wordId, Guid textFileId);
         Task<int> GetFrequency(Guid wordId);
+        Task<int> GetWordsCount();
+        Task<int> GetWordsInTextsCount();
 
         Task AddNewWords(List<WordDto> toAdd, List<WordInTextDto> wordsInTextToAdd);
     }

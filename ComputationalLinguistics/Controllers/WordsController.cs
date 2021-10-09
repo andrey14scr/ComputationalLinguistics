@@ -31,6 +31,9 @@ namespace ComputationalLinguistics.Controllers
 
             var model = await GetWordViewModels(sortBy, pattern, 0, wordsBlockSize);
 
+            var wordsCount = await _wordService.GetWordsCount();
+            var allWordsCount = await _wordService.GetWordsInTextsCount();
+
             return View(new WordsListViewModel
             {
                 Words = model, 

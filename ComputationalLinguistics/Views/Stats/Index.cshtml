@@ -1,0 +1,25 @@
+﻿@model StatisticsViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Статистическая информация</h1>
+<hr />
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">
+            Количество слов
+        </dt>
+        <dd class="col-sm-7">
+            @Model.WordsCount.ToString("##,###")
+        </dd>
+        <dt class="col-sm-3">
+            Количество словоупотреблений
+        </dt>
+        <dd class="col-sm-7">
+            @Model.AllWordsCount.ToString("##,###")
+        </dd>
+    </dl>
+</div>

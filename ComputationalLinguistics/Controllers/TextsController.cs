@@ -73,7 +73,7 @@ namespace ComputationalLinguistics.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task ParseText(IFormFile uploadedFile)
+        public async Task Parse(IFormFile uploadedFile)
         {
             var exceptions = new List<Exception>();
 
@@ -98,7 +98,7 @@ namespace ComputationalLinguistics.Controllers
                         await uploadedFile.CopyToAsync(fileStream);
                     }
 
-                    await _textService.ParseText(path);
+                    //await _textService.ParseText(path);
                 }
                 catch (Exception ex)
                 {

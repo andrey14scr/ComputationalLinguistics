@@ -227,7 +227,6 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 _unitOfWork.Words.Update(newWord);
             }
 
-            //
             await _unitOfWork.SaveChangesAsync();
         }
 
@@ -253,6 +252,16 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         public async Task<int> GetFrequency(Guid wordId)
         {
             return await _unitOfWork.WordsInText.GetNoTrackingWhere(wt => wt.WordId == wordId).CountAsync();
+        }
+
+        public async Task<int> GetWordsCount()
+        {
+            return await _unitOfWork.Words.GetNoTracking().CountAsync();
+        }
+
+        public async Task<int> GetWordsInTextsCount()
+        {
+            return await _unitOfWork.WordsInText.GetNoTracking().CountAsync();
         }
 
         public async Task AddNewWords(List<WordDto> toAdd, List<WordInTextDto> wordsInTextToAdd)

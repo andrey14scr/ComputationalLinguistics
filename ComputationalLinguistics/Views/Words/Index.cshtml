@@ -69,10 +69,10 @@
         {
             <tr>
                 <td class="col-md-5">
-                    @Html.DisplayFor(modelItem => item.Content)
+                    @item.Content
                 </td>
                 <td class="col-md-1">
-                    @Html.DisplayFor(modelItem => item.Frequency)
+                    @item.Frequency
                 </td>
                 <td class="col-md-5">
                     <a asp-action="Details" asp-route-id="@item.Id" asp-route-frequency="@item.Frequency"><input type="button" value="Описание" class="btn-info"/></a>
