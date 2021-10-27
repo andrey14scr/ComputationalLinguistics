@@ -15,7 +15,7 @@ namespace ComputationalLinguistics.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<WordInText>()
-                .HasKey(o => new { o.TextFileId, o.Seek });
+                .HasKey(o => new { o.TextFileId, Seek = o.OffSet });
         }
     }
 }

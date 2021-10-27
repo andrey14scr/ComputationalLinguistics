@@ -83,7 +83,8 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 {
                     Id = w.Id,
                     Content = w.Content,
-                    Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id),
+                    Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id), 
+                    Annotation = w.Annotation,
                 })
                 .ToListAsync();
 
@@ -99,6 +100,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Id = w.Id,
                     Content = w.Content,
                     Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id),
+                    Annotation = w.Annotation,
                 });
 
             var words = isDesc
@@ -120,6 +122,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Id = w.Id,
                     Content = w.Content,
                     Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id),
+                    Annotation = w.Annotation,
                 })
                 .ToListAsync();
             
@@ -132,86 +135,89 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             var oldWord = await GetById(newWord.Id);
             var wordId = wordDto.Id;
 
-            var difference = newWord.Content.Length - oldWord.Content.Length;
-
-            var textFiles = await _unitOfWork.WordsInText.GetNoTracking()
-                .Where(wt => wt.WordId == wordId)
-                .Select(wt => wt.TextFile)
-                .Distinct()
-                .ToListAsync();
-
-            if (difference != 0)
+            if (newWord.Content != oldWord.Content)
             {
-                var toUpdate = new List<WordInText>();
+                var difference = newWord.Content.Length - oldWord.Content.Length;
 
-                foreach (var textFile in textFiles)
+                var textFiles = await _unitOfWork.WordsInText.GetNoTracking()
+                    .Where(wt => wt.WordId == wordId)
+                    .Select(wt => wt.TextFile)
+                    .Distinct()
+                    .ToListAsync();
+
+                if (difference != 0)
                 {
-                    #region File content updating
+                    var toUpdate = new List<WordInText>();
 
-                    var text = await File.ReadAllTextAsync(textFile.FilePath);
-                    var ind = 0;
-                    var allWordsInText = await _unitOfWork.WordsInText
-                        .GetNoTrackingWhere(wt => wt.TextFileId == textFile.Id && wt.WordId == wordId)
-                        .AsNoTracking()
-                        .ToListAsync();
-
-                    foreach (var wit in allWordsInText)
+                    foreach (var textFile in textFiles)
                     {
-                        text = text.Remove(wit.Seek + difference * ind, oldWord.Content.Length)
-                            .Insert(wit.Seek + difference * ind, newWord.Content);
-                        ind++;
-                    }
+                        #region File content updating
 
-                    await File.WriteAllTextAsync(textFile.FilePath, text);
+                        var text = await File.ReadAllTextAsync(textFile.FilePath);
+                        var ind = 0;
+                        var allWordsInText = await _unitOfWork.WordsInText
+                            .GetNoTrackingWhere(wt => wt.TextFileId == textFile.Id && wt.WordId == wordId)
+                            .AsNoTracking()
+                            .ToListAsync();
 
-                    #endregion
-
-                    var min = await _unitOfWork.WordsInText
-                        .GetNoTrackingWhere(wt => wt.TextFileId == textFile.Id && wt.WordId == newWord.Id)
-                        .AsNoTracking()
-                        .MinAsync(wt => wt.Seek);
-                    var wordsInTextToUpdate = await _unitOfWork.WordsInText
-                        .GetTrackingWhere(wt => wt.TextFileId == textFile.Id && wt.Seek > min)
-                        .ToListAsync();
-
-                    _unitOfWork.WordsInText.RemoveRange(wordsInTextToUpdate);
-                    await _unitOfWork.SaveChangesAsync();
-
-                    ind = 1;
-                    foreach (var wordInText in wordsInTextToUpdate)
-                    {
-                        wordInText.Seek += difference * ind;
-                        if (wordInText.WordId == wordId)
+                        foreach (var wit in allWordsInText)
                         {
+                            text = text.Remove(wit.OffSet + difference * ind, oldWord.Content.Length)
+                                .Insert(wit.OffSet + difference * ind, newWord.Content);
                             ind++;
                         }
+
+                        await File.WriteAllTextAsync(textFile.FilePath, text);
+
+                        #endregion
+
+                        var min = await _unitOfWork.WordsInText
+                            .GetNoTrackingWhere(wt => wt.TextFileId == textFile.Id && wt.WordId == newWord.Id)
+                            .AsNoTracking()
+                            .MinAsync(wt => wt.OffSet);
+                        var wordsInTextToUpdate = await _unitOfWork.WordsInText
+                            .GetTrackingWhere(wt => wt.TextFileId == textFile.Id && wt.OffSet > min)
+                            .ToListAsync();
+
+                        _unitOfWork.WordsInText.RemoveRange(wordsInTextToUpdate);
+                        await _unitOfWork.SaveChangesAsync();
+
+                        ind = 1;
+                        foreach (var wordInText in wordsInTextToUpdate)
+                        {
+                            wordInText.OffSet += difference * ind;
+                            if (wordInText.WordId == wordId)
+                            {
+                                ind++;
+                            }
+                        }
+
+                        toUpdate.AddRange(wordsInTextToUpdate);
+                        await _unitOfWork.SaveChangesAsync();
                     }
 
-                    toUpdate.AddRange(wordsInTextToUpdate);
+                    await _unitOfWork.WordsInText.AddRangeAsync(toUpdate);
                     await _unitOfWork.SaveChangesAsync();
                 }
-
-                await _unitOfWork.WordsInText.AddRangeAsync(toUpdate);
-                await _unitOfWork.SaveChangesAsync();
-            }
-            else
-            {
-                foreach (var textFile in textFiles)
+                else
                 {
-                    var text = await File.ReadAllTextAsync(textFile.FilePath);
-                    var wordsInText = await _unitOfWork.WordsInText
-                        .GetNoTrackingWhere(wt => wt.TextFileId == textFile.Id && wt.WordId == wordId)
-                        .ToListAsync();
-
-                    foreach (var wit in wordsInText)
+                    foreach (var textFile in textFiles)
                     {
-                        text = text.Remove(wit.Seek, oldWord.Content.Length).Insert(wit.Seek, newWord.Content);
+                        var text = await File.ReadAllTextAsync(textFile.FilePath);
+                        var wordsInText = await _unitOfWork.WordsInText
+                            .GetNoTrackingWhere(wt => wt.TextFileId == textFile.Id && wt.WordId == wordId)
+                            .ToListAsync();
+
+                        foreach (var wit in wordsInText)
+                        {
+                            text = text.Remove(wit.OffSet, oldWord.Content.Length).Insert(wit.OffSet, newWord.Content);
+                        }
                     }
                 }
             }
-            
 
-            var sameWord = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == newWord.Content).FirstOrDefaultAsync();
+            var sameWord = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == newWord.Content && w.Annotation == newWord.Annotation)
+                .FirstOrDefaultAsync();
 
             if (sameWord is not null)
             {
@@ -245,7 +251,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         public async Task<IEnumerable<int>> GetUsages(Guid wordId, Guid textFileId)
         {
             return await _unitOfWork.WordsInText.GetNoTrackingWhere(wt => wt.WordId == wordId && wt.TextFileId == textFileId)
-                .Select(w => w.Seek)
+                .Select(w => w.OffSet)
                 .ToListAsync();
         }
 

@@ -52,17 +52,20 @@
 <div id="div-table" style="overflow-y: auto;height: 72vh;" onscroll="scrolled('@Model.WordsBlockSize', '@Model.SortBy', '@Model.Pattern')">
     <table class="table table-striped">
         <thead style="position: sticky;top: 0; background: gray;">
-        <tr>
-            <th class="col-md-5" style="position: sticky;top: 0;">
-                Слово
-            </th>
-            <th class="col-md-1" style="position: sticky;top: 0;">
-                Частота
-            </th>
-            <th class="col-md-5" style="position: sticky;top: 0;">
-                Действия
-            </th>
-        </tr>
+            <tr>
+                <th class="col-md-5" style="position: sticky;top: 0;">
+                    Слово
+                </th>
+                <th class="col-md-1" style="position: sticky;top: 0;">
+                    Аннотация
+                </th>
+                <th class="col-md-1" style="position: sticky;top: 0;">
+                    Частота
+                </th>
+                <th class="col-md-5" style="position: sticky;top: 0;">
+                    Действия
+                </th>
+            </tr>
         </thead>
         <tbody id="tableBody">
         @foreach (var item in Model.Words)
@@ -72,12 +75,15 @@
                     @item.Content
                 </td>
                 <td class="col-md-1">
+                    @item.Annotation
+                </td>
+                <td class="col-md-1">
                     @item.Frequency
                 </td>
                 <td class="col-md-5">
-                    <a asp-action="Details" asp-route-id="@item.Id" asp-route-frequency="@item.Frequency"><input type="button" value="Описание" class="btn-info"/></a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Редактировать" class="btn-secondary"/></a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Удалить" class="btn-danger"/></a>
+                    <a asp-action="Details" asp-route-id="@item.Id" asp-route-frequency="@item.Frequency"><input type="button" value="Описание" class="btn-info" /></a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Редактировать" class="btn-secondary" /></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" asp-route-previousPage="@nameof(WordsController.Index)"><input type="button" value="Удалить" class="btn-danger" /></a>
                 </td>
             </tr>
         }

@@ -1,12 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics", "ComputationalLinguistics\ComputationalLinguistics.csproj", "{ED2C213E-F83E-441B-B63F-77E67979789A}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31727.386
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputationalLinguistics", "ComputationalLinguistics\ComputationalLinguistics.csproj", "{ED2C213E-F83E-441B-B63F-77E67979789A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics.DAL", "ComputationalLinguistics.DAL\ComputationalLinguistics.DAL.csproj", "{1AC3E53B-EE6E-4290-862E-A24DF642E365}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputationalLinguistics.DAL", "ComputationalLinguistics.DAL\ComputationalLinguistics.DAL.csproj", "{1AC3E53B-EE6E-4290-862E-A24DF642E365}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputationalLinguistics.Core", "ComputationalLinguistics.Core\ComputationalLinguistics.Core.csproj", "{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComputationalLinguistics.Core", "ComputationalLinguistics.Core\ComputationalLinguistics.Core.csproj", "{F4B91D26-0E43-42EF-8B63-CF46C8D5E6BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncSync", "AsyncSync\AsyncSync.csproj", "{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AsyncSync", "AsyncSync\AsyncSync.csproj", "{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTools", "TestTools\TestTools.csproj", "{12AEB9AA-1760-4CBC-B479-36CFCFB7F8E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +35,15 @@ Global
 		{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A642C582-FA8C-4BA3-95B8-0ED37F2DAFB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12AEB9AA-1760-4CBC-B479-36CFCFB7F8E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12AEB9AA-1760-4CBC-B479-36CFCFB7F8E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12AEB9AA-1760-4CBC-B479-36CFCFB7F8E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12AEB9AA-1760-4CBC-B479-36CFCFB7F8E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {408D93A1-4795-4CBE-AA95-8393831A3237}
 	EndGlobalSection
 EndGlobal

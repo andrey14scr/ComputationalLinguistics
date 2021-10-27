@@ -20,6 +20,11 @@
                 <input asp-for="WordViewModel.Content" class="form-control" />
                 <span asp-validation-for="WordViewModel.Content" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="WordViewModel.Annotation" class="control-label">Аннотация</label>
+                <input asp-for="WordViewModel.Annotation" class="form-control" />
+                <span asp-validation-for="WordViewModel.Annotation" class="text-danger"></span>
+            </div>
             <br />
             <div class="form-group">
                 <input type="submit" value="Сохранить" class="btn btn-primary" />

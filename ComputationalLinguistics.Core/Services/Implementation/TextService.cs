@@ -3,16 +3,22 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using ComputationalLinguistics.Core.Dto;
+using ComputationalLinguistics.Core.Models;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.DAL;
 using ComputationalLinguistics.DAL.Core.Entities;
 using ComputationalLinguistics.DAL.Repositories.Implementation;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ComputationalLinguistics.Core.Services.Implementation
 {
@@ -124,70 +130,63 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 FilePath = fileName,
             };
 
+            var fileContent = await File.ReadAllTextAsync(fileName);
+            fileContent = fileContent.Replace('\n', ' ').Replace('\r', ' ').Replace('\t', ' ');
+            
             var textId = textFile.Id;
-            var sb = new StringBuilder();
             var newWords = new List<Word>();
-            var oldWords = new List<Word>();
             var wordsInText = new List<WordInText>();
-            var position = 0;
 
-            using (var sr = new StreamReader(fileName))
+            var values = new Dictionary<string, string>
             {
-                while (sr.Peek() >= 0)
+                { "text", fileContent },
+            };
+
+            var content = new FormUrlEncodedContent(values);
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var response = await httpClient.PostAsync("http://127.0.0.1:5000/texts?", content);
+
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                using (var doc = JsonDocument.Parse(responseString))
                 {
-                    var next = (char)sr.Read();
+                    var root = doc.RootElement;
+                    var answerElement = root.GetProperty("answer");
 
-                    if (next != '\r')
+                    var answer = JsonSerializer.Deserialize<List<WordInfoJson>>(answerElement.GetString());
+
+                    foreach (var item in answer)
                     {
-                        position++;
-                    }
-
-                    if (!char.IsPunctuation(next) && next != ' ' && next != '\n')
-                    {
-                        sb.Append(next);
-                    }
-                    else
-                    {
-                        var temp = sb.ToString().Trim(' ', '\r', '\n').ToLower();
-
-                        if (string.IsNullOrWhiteSpace(temp) || !char.IsLetter(temp[0]))
-                        {
-                            sb.Clear();
-                            continue;
-                        }
-
-                        var wordInList = oldWords.Find(w => w.Content == temp)
-                                         ?? newWords.Find(w => w.Content == temp);
+                        var wordInList = newWords.Find(w => w.Content == item.Word && w.Annotation == item.Annotation);
 
                         if (wordInList is null)
                         {
-                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == temp)
+                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == item.Word)
                                 .FirstOrDefaultAsync();
                             if (wordInDb is null)
                             {
                                 newWords.Add(new Word
                                 {
                                     Id = Guid.NewGuid(),
-                                    Content = temp,
+                                    Content = item.Word, 
+                                    Annotation = item.Annotation,
                                 });
                                 wordsInText.Add(new WordInText
                                 {
-                                    Seek = position - temp.Length - 1,
+                                    OffSet = item.OffSet,
                                     TextFileId = textId,
                                     WordId = newWords[^1].Id,
                                 });
                             }
                             else
                             {
-                                oldWords.Add(new Word
-                                {
-                                    Id = wordInDb.Id,
-                                    Content = temp,
-                                });
-
                                 wordsInText.Add(new WordInText
                                 {
-                                    Seek = position - temp.Length - 1,
+                                    OffSet = item.OffSet,
                                     TextFileId = textId,
                                     WordId = wordInDb.Id,
                                 });
@@ -197,13 +196,11 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                         {
                             wordsInText.Add(new WordInText
                             {
-                                Seek = position - temp.Length - 1,
+                                OffSet = item.OffSet,
                                 TextFileId = textId,
                                 WordId = wordInList.Id,
                             });
                         }
-
-                        sb.Clear();
                     }
                 }
             }
@@ -211,7 +208,6 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             await _unitOfWork.TextFiles.AddAsync(textFile);
             await _unitOfWork.WordsInText.AddRangeAsync(wordsInText);
             await _unitOfWork.Words.AddRangeAsync(newWords);
-            _unitOfWork.Words.UpdateRange(oldWords);
             await _unitOfWork.SaveChangesAsync();
         }
     }
