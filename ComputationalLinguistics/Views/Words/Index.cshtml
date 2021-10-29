@@ -26,10 +26,11 @@
                     <option value="@Variables.OnFrequencyPattern">Частоте ↑</option>
                     <option value="@Variables.OnFrequencyBackPattern">Частоте ↓</option>
                     <option value="@Variables.OnPatternPattern">Шаблону</option>
+                    <option value="@Variables.OnAnnotationPattern">Аннотации</option>
                 </select>
             </div>
 
-            @if (Model.SortBy == Variables.OnPatternPattern)
+            @if (Model.SortBy == Variables.OnPatternPattern || Model.SortBy == Variables.OnAnnotationPattern)
             {
                 <div class="d-inline-flex p-2">
                     <input value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">

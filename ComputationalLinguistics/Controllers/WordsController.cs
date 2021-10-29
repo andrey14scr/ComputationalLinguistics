@@ -167,6 +167,10 @@ namespace ComputationalLinguistics.Controllers
                     if(!string.IsNullOrWhiteSpace(pattern))
                         words = await _wordService.SortBy(w => w.Content.Substring(0, pattern.Length) == pattern, w => w.Content, skip, next);
                     break;
+                case Variables.OnAnnotationPattern:
+                    if (!string.IsNullOrWhiteSpace(pattern))
+                        words = await _wordService.SortBy(w => w.Annotation.Substring(0, pattern.Length) == pattern.ToUpper(), w => w.Annotation, skip, next);
+                    break;
                 case Variables.OnAlphabetBackPattern:
                     words = await _wordService.GetSortedBy(w => w.Content, skip, next);
                     break;

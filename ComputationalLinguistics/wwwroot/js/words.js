@@ -17,7 +17,7 @@ function scrolled(blockSize, sortBy, pattern) {
 }
 
 function checkHidden(){    
-    if (select.options[select.selectedIndex].value === '_pattern') {
+    if (select.options[select.selectedIndex].value === '_pattern' || select.options[select.selectedIndex].value === '_annotation') {
         input.parentNode.classList.add("p-2");
         input.value = '';
         input.hidden = false;

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ComputationalLinguistics.Core.Dto;
+using System.Text;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -71,6 +72,20 @@ namespace ComputationalLinguistics.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task ReParse([FromBody]TextReparseJsonModel reparseInfo)
+        {
+            var textFileDto = await _textService.GetById(reparseInfo.Id);
+
+            await using (var fileStream = new FileStream(textFileDto.FilePath, FileMode.Create))
+            {
+                var bytes = Encoding.UTF8.GetBytes(reparseInfo.Txt);
+                await fileStream.WriteAsync(bytes, 0, bytes.Length);
+            }
+
+            await _textService.ParseText(textFileDto.FilePath);
         }
 
         public async Task Parse(IFormFile uploadedFile)

@@ -121,17 +121,25 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             var textFile = await _unitOfWork.TextFiles.GetNoTracking().FirstOrDefaultAsync(t => t.FilePath == fileName);
             if (textFile is not null)
             {
-                throw new Exception($"File {Path.GetFileName(fileName)} is already parsed");
+                var wordsInTextFilesToDelete = await _unitOfWork.WordsInText.GetTrackingWhere(w => w.TextFileId == textFile.Id).ToListAsync();
+                var wordsToDelete = wordsInTextFilesToDelete.Select(wit => _unitOfWork.Words.GetTrackingWhere(w => w.Id == wit.WordId).First()).ToList();
+                _unitOfWork.WordsInText.RemoveRange(wordsInTextFilesToDelete);
+                _unitOfWork.Words.RemoveRange(wordsToDelete);
+                await _unitOfWork.SaveChangesAsync();
+                //throw new Exception($"File {Path.GetFileName(fileName)} is already parsed");
+            }
+            else
+            {
+                textFile = new TextFile
+                {
+                    Id = Guid.NewGuid(),
+                    FilePath = fileName,
+                };
+
+                await _unitOfWork.TextFiles.AddAsync(textFile);
             }
 
-            textFile = new TextFile
-            {
-                Id = Guid.NewGuid(),
-                FilePath = fileName,
-            };
-
             var fileContent = await File.ReadAllTextAsync(fileName);
-            fileContent = fileContent.Replace('\n', ' ').Replace('\r', ' ').Replace('\t', ' ');
             
             var textId = textFile.Id;
             var newWords = new List<Word>();
@@ -165,7 +173,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
                         if (wordInList is null)
                         {
-                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == item.Word)
+                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == item.Word && w.Annotation == item.Annotation)
                                 .FirstOrDefaultAsync();
                             if (wordInDb is null)
                             {
@@ -173,11 +181,11 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                                 {
                                     Id = Guid.NewGuid(),
                                     Content = item.Word, 
-                                    Annotation = item.Annotation,
+                                    Annotation = item.Annotation.ToUpper(),
                                 });
                                 wordsInText.Add(new WordInText
                                 {
-                                    OffSet = item.OffSet,
+                                    OffSet = item.OffSet + 1,
                                     TextFileId = textId,
                                     WordId = newWords[^1].Id,
                                 });
@@ -186,7 +194,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                             {
                                 wordsInText.Add(new WordInText
                                 {
-                                    OffSet = item.OffSet,
+                                    OffSet = item.OffSet + 1,
                                     TextFileId = textId,
                                     WordId = wordInDb.Id,
                                 });
@@ -196,7 +204,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                         {
                             wordsInText.Add(new WordInText
                             {
-                                OffSet = item.OffSet,
+                                OffSet = item.OffSet + 1,
                                 TextFileId = textId,
                                 WordId = wordInList.Id,
                             });
@@ -205,7 +213,6 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 }
             }
 
-            await _unitOfWork.TextFiles.AddAsync(textFile);
             await _unitOfWork.WordsInText.AddRangeAsync(wordsInText);
             await _unitOfWork.Words.AddRangeAsync(newWords);
             await _unitOfWork.SaveChangesAsync();

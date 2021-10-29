@@ -9,5 +9,6 @@
         public const string OnFrequencyPattern = "_freq";
         public const string OnFrequencyBackPattern = "_freqback";
         public const string OnPatternPattern = "_pattern";
+        public const string OnAnnotationPattern = "_annotation";
     }
 }
