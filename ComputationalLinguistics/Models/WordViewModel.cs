@@ -10,6 +10,6 @@ namespace ComputationalLinguistics.Models
         public string Content { get; set; }
         public IEnumerable<WordContextFile> WordContextFiles { get; set; }
         public int Frequency { get; set; }
-        public string Annotation { get; set; }
+        public string Tag { get; set; }
     }
 }

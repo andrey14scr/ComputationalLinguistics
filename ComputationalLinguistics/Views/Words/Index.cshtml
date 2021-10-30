@@ -26,7 +26,7 @@
                     <option value="@Variables.OnFrequencyPattern">Частоте ↑</option>
                     <option value="@Variables.OnFrequencyBackPattern">Частоте ↓</option>
                     <option value="@Variables.OnPatternPattern">Шаблону</option>
-                    <option value="@Variables.OnAnnotationPattern">Аннотации</option>
+                    <option value="@Variables.OnAnnotationPattern">Тэгу</option>
                 </select>
             </div>
 
@@ -44,7 +44,7 @@
             }
 
             <div class="d-inline-flex p-2">
-                <input type="submit" value="Применить">
+                <input type="submit" data-tooltip="эта подсказка должна быть длиннее, чем элемент" value="Применить">
             </div>
         </div>
     </form>
@@ -58,7 +58,7 @@
                     Слово
                 </th>
                 <th class="col-md-1" style="position: sticky;top: 0;">
-                    Аннотация
+                    Тэг
                 </th>
                 <th class="col-md-1" style="position: sticky;top: 0;">
                     Частота
@@ -75,8 +75,8 @@
                 <td class="col-md-5">
                     @item.Content
                 </td>
-                <td class="col-md-1">
-                    @item.Annotation
+                <td class="col-md-1 tag-tooltip">
+                    @item.Tag
                 </td>
                 <td class="col-md-1">
                     @item.Frequency

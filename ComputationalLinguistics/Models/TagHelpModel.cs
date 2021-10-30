@@ -1,13 +1,11 @@
 ﻿using System;
 
-namespace ComputationalLinguistics.Core.Dto
+namespace ComputationalLinguistics.Models
 {
-    public class AnnotationHelpDto
+    public class TagInfoModel
     {
         public Guid Id { get; set; }
-
         public string TagName { get; set; }
-
         public string Info { get; set; }
     }
 }

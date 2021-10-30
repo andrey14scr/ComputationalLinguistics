@@ -12,13 +12,15 @@ namespace ComputationalLinguistics.DAL.Repositories.Implementation
         public IRepository<Word> Words { get; }
         public IRepository<TextFile> TextFiles { get; }
         public IRepository<WordInText> WordsInText { get; }
+        public IRepository<TagInfo> TagsInfo { get; }
 
-        public UnitOfWork(ComputationalLinguisticsContext context, IRepository<Word> words, IRepository<TextFile> textFiles, IRepository<WordInText> wordsInText)
+        public UnitOfWork(ComputationalLinguisticsContext context, IRepository<Word> words, IRepository<TextFile> textFiles, IRepository<WordInText> wordsInText, IRepository<TagInfo> tagsInfo)
         {
             _context = context;
             Words = words;
             TextFiles = textFiles;
             WordsInText = wordsInText;
+            TagsInfo = tagsInfo;
         }
 
         public async Task<int> SaveChangesAsync()

@@ -118,7 +118,7 @@ namespace ComputationalLinguistics.Controllers
                 {
                     Id = wvm.WordViewModel.Id, 
                     Content = wvm.WordViewModel.Content, 
-                    Annotation = wvm.WordViewModel.Annotation,
+                    Tag = wvm.WordViewModel.Tag,
                 });
 
                 return RedirectToAction(nameof(Index));
@@ -169,7 +169,7 @@ namespace ComputationalLinguistics.Controllers
                     break;
                 case Variables.OnAnnotationPattern:
                     if (!string.IsNullOrWhiteSpace(pattern))
-                        words = await _wordService.SortBy(w => w.Annotation.Substring(0, pattern.Length) == pattern.ToUpper(), w => w.Annotation, skip, next);
+                        words = await _wordService.SortBy(w => w.Tag.Substring(0, pattern.Length) == pattern.ToUpper(), w => w.Tag, skip, next);
                     break;
                 case Variables.OnAlphabetBackPattern:
                     words = await _wordService.GetSortedBy(w => w.Content, skip, next);

@@ -84,7 +84,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Id = w.Id,
                     Content = w.Content,
                     Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id), 
-                    Annotation = w.Annotation,
+                    Tag = w.Tag,
                 })
                 .ToListAsync();
 
@@ -100,7 +100,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Id = w.Id,
                     Content = w.Content,
                     Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id),
-                    Annotation = w.Annotation,
+                    Tag = w.Tag,
                 });
 
             var words = isDesc
@@ -122,7 +122,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Id = w.Id,
                     Content = w.Content,
                     Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id),
-                    Annotation = w.Annotation,
+                    Tag = w.Tag,
                 })
                 .ToListAsync();
             
@@ -216,7 +216,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 }
             }
 
-            var sameWord = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == newWord.Content && w.Annotation == newWord.Annotation)
+            var sameWord = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == newWord.Content && w.Tag == newWord.Tag)
                 .FirstOrDefaultAsync();
 
             if (sameWord is not null)

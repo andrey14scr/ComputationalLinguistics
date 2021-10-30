@@ -8,6 +8,7 @@ namespace ComputationalLinguistics.DAL
         public DbSet<Word> Words { get; set; }
         public DbSet<TextFile> TextFiles { get; set; }
         public DbSet<WordInText> WordsInText { get; set; }
+        public DbSet<TagInfo> TagsInfo { get; set; }
 
         public ComputationalLinguisticsContext(DbContextOptions<ComputationalLinguisticsContext> options) 
             : base(options) { }

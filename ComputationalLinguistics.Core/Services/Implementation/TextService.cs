@@ -178,11 +178,11 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                             continue;
                         }
 
-                        var wordInList = newWords.Find(w => w.Content == item.Word.ToLower() && w.Annotation == item.Annotation);
+                        var wordInList = newWords.Find(w => w.Content == item.Word.ToLower() && w.Tag == item.Annotation);
 
                         if (wordInList is null)
                         {
-                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == item.Word.ToLower() && w.Annotation == item.Annotation)
+                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == item.Word.ToLower() && w.Tag == item.Annotation)
                                 .FirstOrDefaultAsync();
                             if (wordInDb is null)
                             {
@@ -190,7 +190,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                                 {
                                     Id = Guid.NewGuid(),
                                     Content = item.Word.ToLower(), 
-                                    Annotation = item.Annotation.ToUpper(),
+                                    Tag = item.Annotation.ToUpper(),
                                 });
                                 wordsInText.Add(new WordInText
                                 {

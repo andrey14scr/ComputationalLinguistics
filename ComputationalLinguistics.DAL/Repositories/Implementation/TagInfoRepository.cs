@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace ComputationalLinguistics.DAL.Repositories.Implementation
 {
-    public class AnnotationHelpRepository : Repository<Word>
+    public class TagInfoRepository : Repository<TagInfo>
     {
-        public AnnotationHelpRepository(ComputationalLinguisticsContext context) : base(context)
+        public TagInfoRepository(ComputationalLinguisticsContext context) : base(context)
         {
         }
 
-        public async Task<Word> GetByIdAsync(Guid id)
+        public async Task<TagInfo> GetByIdAsync(Guid id)
         {
             return await _table.AsNoTracking().FirstOrDefaultAsync(o => o.Id.Equals(id));
         }

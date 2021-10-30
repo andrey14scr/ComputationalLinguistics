@@ -1,0 +1,27 @@
+﻿@model IEnumerable<TagInfoModel>
+@{
+    ViewData["Title"] = "Tag Help";
+}
+
+<h1>Информация о тэгах</h1>
+<hr />
+
+@foreach (var item in Model)
+{
+    <div>
+        <dl class="row">
+            <dt class="col-sm-2">
+                Тэг
+            </dt>
+            <dd class="col-sm-10">
+                @item.TagName
+            </dd>
+            <dt class="col-sm-2">
+                Описание
+            </dt>
+            <dd class="col-sm-10">
+                @item.Info
+            </dd>
+        </dl>
+    </div>
+}

@@ -4,14 +4,16 @@ using ComputationalLinguistics.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ComputationalLinguistics.DAL.Migrations
 {
     [DbContext(typeof(ComputationalLinguisticsContext))]
-    partial class ComputationalLinguisticsContextModelSnapshot : ModelSnapshot
+    [Migration("20211030075113_AddTagHelp")]
+    partial class AddTagHelp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,15 +65,15 @@ namespace ComputationalLinguistics.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Annotation")
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(120)");
 
-                    b.Property<string>("Tag")
-                        .HasColumnType("nvarchar(10)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "Content", "Tag" }, "IWordInfo");
+                    b.HasIndex(new[] { "Content", "Annotation" }, "IWordInfo");
 
                     b.ToTable("Words");
                 });

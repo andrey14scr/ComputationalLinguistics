@@ -18,6 +18,10 @@ namespace ComputationalLinguistics.Tools
             CreateMap<TextFileDto, TextFileViewModel>().ReverseMap();
 
             CreateMap<WordInTextDto, WordInText>().ReverseMap();
+
+            CreateMap<TagInfo, TagInfoModel>().ReverseMap();
+            CreateMap<TagInfo, TagInfoDto>().ReverseMap();
+            CreateMap<TagInfoModel, TagInfoDto>().ReverseMap();
         }
     }
 }

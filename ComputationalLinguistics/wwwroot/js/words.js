@@ -9,6 +9,44 @@ var isCompleteDownload = true;
 
 select.onchange = checkHidden;
 
+var tooltipElem;
+
+document.onmouseover = function (event) {
+    var target = event.target;
+
+    if (!target.classList.contains('tag-tooltip')) {
+        return;
+    }
+
+    var tooltip = getTagName(target.innerText);
+
+    tooltipElem = document.createElement('div');
+    tooltipElem.className = 'mytooltip';
+    tooltipElem.innerHTML = tooltip;
+    document.body.append(tooltipElem);
+
+    var coords = target.getBoundingClientRect();
+
+    var left = coords.left + (target.offsetWidth - tooltipElem.offsetWidth) / 2;
+    if (left < 0)
+        left = 0;
+
+    var top = coords.top - tooltipElem.offsetHeight - 5;
+    if (top < 0)
+        top = coords.top + target.offsetHeight + 5;
+
+    //tooltipElem.style.position = 'absolute';
+    tooltipElem.style.left = left + 'px';
+    tooltipElem.style.top = top + 'px';
+};
+
+document.onmouseout = function (e) {
+    if (tooltipElem) {
+        tooltipElem.remove();
+        tooltipElem = null;
+    }
+};
+
 function scrolled(blockSize, sortBy, pattern) {
     if (isCompleteDownload && scrollDiv.offsetHeight + scrollDiv.scrollTop >= scrollDiv.scrollHeight - 3) {
         isCompleteDownload = false;
@@ -58,4 +96,12 @@ function getWords(blockSize, sortBy, pattern) {
     }
 
     request.send();
+}
+
+function getTagName(name) {
+    var request = new XMLHttpRequest();
+    request.open('GET', `/Help/GetTagByName?name=${name}`, false);
+    request.send();
+
+    return request.response;
 }

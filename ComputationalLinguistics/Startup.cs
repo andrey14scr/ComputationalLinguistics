@@ -31,14 +31,18 @@ namespace ComputationalLinguistics
             services.AddTransient<IRepository<Word>, WordRepository>();
             services.AddTransient<IRepository<WordInText>, WordInTextRepository>();
             services.AddTransient<IRepository<TextFile>, TextFileRepository>();
+            services.AddTransient<IRepository<TagInfo>, TagInfoRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IWordService, WordService>();
             services.AddScoped<ITextService, TextService>();
+            services.AddScoped<ITagHelpService, TagHelpService>();
 
             services.AddAutoMapper(typeof(AutoMap).Assembly);
             
             services.AddDbContext<ComputationalLinguisticsContext>(opt => 
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
