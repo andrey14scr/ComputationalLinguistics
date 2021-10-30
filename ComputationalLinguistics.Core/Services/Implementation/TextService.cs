@@ -133,12 +133,14 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 textFile = new TextFile
                 {
                     Id = Guid.NewGuid(),
-                    FilePath = fileName,
+                    FilePath = fileName, 
+                    FileAnnotationPath = "Annotated\\" + Path.GetFileNameWithoutExtension(fileName) + "_annotated_" + Path.GetExtension(fileName),
                 };
 
                 await _unitOfWork.TextFiles.AddAsync(textFile);
             }
 
+            var annotatedText = string.Empty;
             var fileContent = await File.ReadAllTextAsync(fileName);
             
             var textId = textFile.Id;
@@ -169,18 +171,25 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
                     foreach (var item in answer)
                     {
-                        var wordInList = newWords.Find(w => w.Content == item.Word && w.Annotation == item.Annotation);
+                        annotatedText += $"{item.Word}[{item.Annotation}] ";
+
+                        if (item.Word.Any(x => !char.IsLetter(x)))
+                        {
+                            continue;
+                        }
+
+                        var wordInList = newWords.Find(w => w.Content == item.Word.ToLower() && w.Annotation == item.Annotation);
 
                         if (wordInList is null)
                         {
-                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == item.Word && w.Annotation == item.Annotation)
+                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == item.Word.ToLower() && w.Annotation == item.Annotation)
                                 .FirstOrDefaultAsync();
                             if (wordInDb is null)
                             {
                                 newWords.Add(new Word
                                 {
                                     Id = Guid.NewGuid(),
-                                    Content = item.Word, 
+                                    Content = item.Word.ToLower(), 
                                     Annotation = item.Annotation.ToUpper(),
                                 });
                                 wordsInText.Add(new WordInText
@@ -212,6 +221,8 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     }
                 }
             }
+
+            File.WriteAllText(textFile.FileAnnotationPath, annotatedText);
 
             await _unitOfWork.WordsInText.AddRangeAsync(wordsInText);
             await _unitOfWork.Words.AddRangeAsync(newWords);

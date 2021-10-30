@@ -150,6 +150,26 @@ namespace ComputationalLinguistics.Controllers
             return View(model);
         }
 
+        public async Task<IActionResult> DetailsAnnotated(Guid id, Guid? wordId)
+        {
+            var textFile = await _textService.GetById(id);
+
+            if (textFile is null)
+            {
+                return View("UserError", new UserErrorViewModel { Message = "This text file doesn't exist" });
+            }
+
+            var text = await System.IO.File.ReadAllTextAsync(textFile.FileAnnotationPath);
+            var model = new TextFileInfoViewModel
+            {
+                Id = id,
+                Text = text,
+                FileName = Path.GetFileName(textFile.FilePath),
+            };
+
+            return View(model);
+        }
+
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id is null)

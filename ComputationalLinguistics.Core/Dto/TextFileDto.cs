@@ -6,5 +6,6 @@ namespace ComputationalLinguistics.Core.Dto
     {
         public Guid Id { get; set; }
         public string FilePath { get; set; }
+        public string FileAnnotationPath { get; set; }
     }
 }

@@ -13,15 +13,14 @@ def parse(txt):
     offset = 0
 
     for token in mylist:
-        if token[0].isalpha():
-            x = {
-                "word": token[0].lower(),
-                "prop": token[1],
-                "offset": offset
-            }
-            offset = txt.find(token[0], offset)
-            arr.append(x)
-            offset += len(token[0])
+        x = {
+            "word": token[0],
+            "prop": token[1],
+            "offset": offset
+        }
+        offset = txt.find(token[0], offset)
+        arr.append(x)
+        offset += len(token[0])
 
     return json.dumps(arr)
 

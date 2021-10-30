@@ -10,5 +10,7 @@ namespace ComputationalLinguistics.DAL.Core.Entities
         public Guid Id { get; set; }
         [Column(TypeName = "nvarchar(200)")]
         public string FilePath { get; set; }
+        [Column(TypeName = "nvarchar(220)")]
+        public string FileAnnotationPath { get; set; }
     }
 }

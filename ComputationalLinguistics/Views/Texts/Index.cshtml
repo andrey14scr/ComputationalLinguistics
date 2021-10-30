@@ -20,7 +20,7 @@
     @foreach (var file in Model)
     {
         <li>
-            <a asp-action="Details" asp-route-id="@file.Id">@System.IO.Path.GetFileName(file.FilePath)</a>
+            <a asp-action="Details" asp-route-id="@file.Id">@System.IO.Path.GetFileName(file.FilePath)</a> (<a asp-action="DetailsAnnotated" asp-route-id="@file.Id">аннотированный</a>)
         </li>
     }
 </ul>

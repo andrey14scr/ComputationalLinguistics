@@ -1,0 +1,8 @@
+﻿@model TextFileInfoViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Аннотированный @Model.FileName</h2>
+<textarea readonly class="form-control" id="text" name="textFile" style="width: 100%; height: 78vh;">@Model.Text</textarea>
