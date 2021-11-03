@@ -4,6 +4,7 @@ using ComputationalLinguistics.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ComputationalLinguistics.Models;
 
@@ -14,9 +15,10 @@ namespace ComputationalLinguistics.Controllers
         private readonly ITagHelpService _tagHelpService;
         private readonly IMapper _mapper;
 
-        public HelpController(ITagHelpService tagHelpService)
+        public HelpController(ITagHelpService tagHelpService, IMapper mapper)
         {
             _tagHelpService = tagHelpService;
+            _mapper = mapper;
         }
 
         public IActionResult Index()
@@ -28,7 +30,7 @@ namespace ComputationalLinguistics.Controllers
         {
             var allTags = await _tagHelpService.GetAll();
             var model = _mapper.Map<IEnumerable<TagInfoModel>>(allTags);
-            return View(model);
+            return View(model.OrderBy(m => m.TagName));
         }
 
         public async Task<IActionResult> GetTagByName(string name)
