@@ -8,19 +8,23 @@ api = Api(app)
 
 def parse(txt):
     parts = nltk.word_tokenize(txt)
-    mylist = nltk.pos_tag(parts)
+    tokens = nltk.pos_tag(parts)
     arr = []
     offset = 0
 
-    for token in mylist:
+    for token in tokens:
+        word = token[0]
+        if (word == '``' or word == "''"):
+            word = '"'
+
         x = {
-            "word": token[0],
+            "word": word.lower(),
             "prop": token[1],
             "offset": offset
         }
-        offset = txt.find(token[0], offset)
+        offset = txt.find(word, offset)
         arr.append(x)
-        offset += len(token[0])
+        offset += len(word)
 
     return json.dumps(arr)
 
