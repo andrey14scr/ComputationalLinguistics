@@ -1,5 +1,10 @@
 import nltk
 import json
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+from word_forms.word_forms import get_word_forms
+import inflect
 
 def task(txt):
     parts = nltk.word_tokenize(txt)
@@ -24,6 +29,22 @@ def task(txt):
     return json.dumps(arr)
 
 if __name__ == '__main__':
-    t = 'I am in "Minsk" city now.'
-    result = task(t)
-    print(result)
+    nltk.download('wordnet')
+    nltk.download('punkt')
+    nltk.download('averaged_perceptron_tagger')
+    #t = 'I am in "Minsk" city now.'
+    #result = task(t)
+    #print(result)wordnet
+
+    wl = WordNetLemmatizer()
+    #print(wl.lemmatize("downloading", pos="v"))
+
+    all = get_word_forms("was")
+    words = list()
+    for e in all.values():
+        for f in e:
+            words.append(f)
+
+    tokens = nltk.pos_tag(words)
+    print(json.dumps(tokens))
+
