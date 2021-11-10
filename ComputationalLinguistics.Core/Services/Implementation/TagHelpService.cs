@@ -14,7 +14,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private IMemoryCache _cache;
+        private readonly IMemoryCache _cache;
 
         public TagHelpService(IUnitOfWork unitOfWork, IMapper mapper, IMemoryCache cache)
         {

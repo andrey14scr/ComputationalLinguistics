@@ -11,5 +11,6 @@ namespace ComputationalLinguistics.Models
         public IEnumerable<WordContextFile> WordContextFiles { get; set; }
         public int Frequency { get; set; }
         public string Tag { get; set; }
+        public WordForms Forms { get; set; }
     }
 }

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http.Headers;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 
@@ -234,6 +237,44 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             }
 
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<WordForms> GetForms(string word)
+        {
+            var values = new Dictionary<string, string>
+            {
+                { "word", word },
+            };
+
+            var init = string.Empty;
+            var forms = new List<string[]>();
+
+            var content = new FormUrlEncodedContent(values);
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                var response = await httpClient.PostAsync("http://127.0.0.1:5000/forms?", content);
+
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                using (var doc = JsonDocument.Parse(responseString))
+                {
+                    var root = doc.RootElement;
+                    var initElement = root.GetProperty("init");
+                    var formsElement = root.GetProperty("forms");
+
+                    init = initElement.GetString();
+                    forms = JsonSerializer.Deserialize<List<string[]>>(formsElement.GetString());
+                }
+            }
+
+            return new WordForms
+            {
+                Initial = init, 
+                Forms = forms?.Select(v => (v[0], v[1])).Distinct().ToList(),
+            };
         }
 
         public async Task<IEnumerable<WordContextFile>> GetContextFiles(Guid id)

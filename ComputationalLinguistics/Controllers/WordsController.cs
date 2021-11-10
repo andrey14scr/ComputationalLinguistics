@@ -47,17 +47,19 @@ namespace ComputationalLinguistics.Controllers
                 return NotFound();
             }
 
-            var word = await _wordService.GetById(id.Value);
-            var contextFiles = await _wordService.GetContextFiles(id.Value);
-
-            if (word == null)
+            var wordDto = await _wordService.GetById(id.Value);
+            if (wordDto == null)
             {
                 return NotFound();
             }
 
-            var model = _mapper.Map<WordViewModel>(word);
+            var contextFiles = await _wordService.GetContextFiles(id.Value);
+            var wordForms = await _wordService.GetForms(wordDto.Content);
+
+            var model = _mapper.Map<WordViewModel>(wordDto);
             model.WordContextFiles = contextFiles;
             model.Frequency = frequency;
+            model.Forms = wordForms;
 
             return View(model);
         }

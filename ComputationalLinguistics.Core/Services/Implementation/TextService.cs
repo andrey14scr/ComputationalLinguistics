@@ -1,24 +1,19 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.Core.Models;
 using ComputationalLinguistics.Core.Services.Interfaces;
-using ComputationalLinguistics.DAL;
 using ComputationalLinguistics.DAL.Core.Entities;
 using ComputationalLinguistics.DAL.Repositories.Implementation;
 using ComputationalLinguistics.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ComputationalLinguistics.Core.Services.Implementation
 {
