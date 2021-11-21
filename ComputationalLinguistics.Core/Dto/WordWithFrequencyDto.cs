@@ -8,5 +8,6 @@ namespace ComputationalLinguistics.Core.Dto
         public string Content { get; set; }
         public string Tag { get; set; }
         public int Frequency { get; set; }
+        public string Initial { get; set; }
     }
 }

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<ComputationalLinguistics.Core.Dto.TagInfoDto>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div>
+    <h2 style="float: left">Список доступных тэгов</h2>
+    <p style="text-align: right">
+        <a asp-action="Create" class="btn btn-success">Добавить</a>
+    </p>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="col-md-1">
+                Тэг
+            </th>
+            <th class="col-md-1">
+                Описание
+            </th>
+            <th class="col-md-1">
+                Действие
+            </th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td class="col-md-1">
+                @item.TagName
+            </td>
+            <td class="col-md-3 tag-tooltip">
+                @item.Info
+            </td>
+            <td class="col-md-5">
+                <a asp-action="Edit" asp-route-id="@item.Id"><input type="button" value="Редактировать" class="btn-secondary" /></a>
+                <a asp-action="Delete" asp-route-id="@item.Id"><input type="button" value="Удалить" class="btn-danger" /></a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -15,5 +15,8 @@ namespace ComputationalLinguistics.DAL.Core.Entities
 
         [Column(TypeName = "nvarchar(10)")]
         public string Tag { get; set; }
+
+        [Column(TypeName = "nvarchar(120)")]
+        public string Initial { get; set; }
     }
 }

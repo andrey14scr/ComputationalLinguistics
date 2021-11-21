@@ -48,6 +48,11 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
         public async Task Add(WordDto wordDto)
         {
+            if (_unitOfWork.TagsInfo.GetNoTrackingWhere(t => t.TagName == wordDto.Tag).FirstOrDefault() is null)
+            {
+                throw new Exception("Нет такого тэга");
+            }
+
             var word = _mapper.Map<Word>(wordDto);
             await _unitOfWork.Words.AddAsync(word);
             await _unitOfWork.SaveChangesAsync();
@@ -134,6 +139,11 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
         public async Task Update(WordDto wordDto)
         {
+            if (_unitOfWork.TagsInfo.GetNoTrackingWhere(t => t.TagName == wordDto.Tag).FirstOrDefault() is null)
+            {
+                throw new Exception("Нет такого тэга");
+            }
+
             var newWord = _mapper.Map<Word>(wordDto);
             var oldWord = await GetById(newWord.Id);
             var wordId = wordDto.Id;
@@ -219,17 +229,26 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 }
             }
 
-            var sameWord = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == newWord.Content && w.Tag == newWord.Tag)
-                .FirstOrDefaultAsync();
-
-            if (sameWord is not null)
+            if (newWord.Content != oldWord.Content || newWord.Tag != oldWord.Tag)
             {
-                foreach (var wordInText in await _unitOfWork.WordsInText.GetTrackingWhere(wit => wit.WordId == newWord.Id).ToListAsync())
-                {
-                    wordInText.WordId = sameWord.Id;
-                }
+                var sameWord = await _unitOfWork.Words
+                    .GetNoTrackingWhere(w => w.Content == newWord.Content && w.Tag == newWord.Tag)
+                    .FirstOrDefaultAsync();
 
-                _unitOfWork.Words.Remove(newWord);
+                if (sameWord is not null)
+                {
+                    foreach (var wordInText in await _unitOfWork.WordsInText
+                        .GetTrackingWhere(wit => wit.WordId == newWord.Id).ToListAsync())
+                    {
+                        wordInText.WordId = sameWord.Id;
+                    }
+
+                    _unitOfWork.Words.Remove(newWord);
+                }
+                else
+                {
+                    _unitOfWork.Words.Update(newWord);
+                }
             }
             else
             {

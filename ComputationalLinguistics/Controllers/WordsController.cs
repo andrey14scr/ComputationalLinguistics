@@ -56,6 +56,12 @@ namespace ComputationalLinguistics.Controllers
             var contextFiles = await _wordService.GetContextFiles(id.Value);
             var wordForms = await _wordService.GetForms(wordDto.Content);
 
+            if (string.IsNullOrWhiteSpace(wordDto.Initial))
+            {
+                wordDto.Initial = wordForms.Initial;
+                await _wordService.Update(wordDto);
+            }
+
             var model = _mapper.Map<WordViewModel>(wordDto);
             model.WordContextFiles = contextFiles;
             model.Frequency = frequency;
@@ -71,7 +77,7 @@ namespace ComputationalLinguistics.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind("Content")] CreateWordModel createWordModel)
+        public async Task<ActionResult> Create(CreateWordModel createWordModel)
         {
             WordDto wordDto = null;
             if (ModelState.IsValid)
@@ -81,7 +87,9 @@ namespace ComputationalLinguistics.Controllers
                     wordDto = new WordDto
                     {
                         Id = Guid.NewGuid(),
-                        Content = createWordModel.Content,
+                        Content = createWordModel.Content, 
+                        Tag = createWordModel.Tag, 
+                        Initial = createWordModel.Initial,
                     };
                     await _wordService.Add(wordDto);
                     return RedirectToAction(nameof(Index));
@@ -104,8 +112,16 @@ namespace ComputationalLinguistics.Controllers
                 return NotFound();
             }
 
-            var word = await _wordService.GetById(id.Value);
-            var model = _mapper.Map<WordViewModel>(word);
+            var wordDto = await _wordService.GetById(id.Value);
+            var wordForms = await _wordService.GetForms(wordDto.Content);
+
+            if (string.IsNullOrWhiteSpace(wordDto.Initial))
+            {
+                wordDto.Initial = wordForms.Initial;
+                await _wordService.Update(wordDto);
+            }
+
+            var model = _mapper.Map<WordViewModel>(wordDto);
 
             return View(new WordViewModelFrom { PreviousPage = previousPage, WordViewModel = model });
         }
@@ -116,12 +132,22 @@ namespace ComputationalLinguistics.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _wordService.Update(new WordDto
+                try
                 {
-                    Id = wvm.WordViewModel.Id, 
-                    Content = wvm.WordViewModel.Content, 
-                    Tag = wvm.WordViewModel.Tag,
-                });
+                    await _wordService.Update(new WordDto
+                    {
+                        Id = wvm.WordViewModel.Id,
+                        Content = wvm.WordViewModel.Content,
+                        Tag = wvm.WordViewModel.Tag, 
+                        Initial = wvm.WordViewModel.Initial,
+                    });
+                }
+                catch (Exception ex)
+                {
+                    var msg = ExceptionBuilder.GetExceptionMessages(ex);
+
+                    return View("UserError", new UserErrorViewModel { Message = "Error while word updating", InnerMessages = msg });
+                }
 
                 return RedirectToAction(nameof(Index));
             }

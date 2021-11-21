@@ -12,5 +12,6 @@ namespace ComputationalLinguistics.Models
         public int Frequency { get; set; }
         public string Tag { get; set; }
         public WordForms Forms { get; set; }
+        public string Initial { get; set; }
     }
 }

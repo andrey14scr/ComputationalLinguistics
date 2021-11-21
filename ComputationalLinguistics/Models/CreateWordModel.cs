@@ -8,6 +8,10 @@ namespace ComputationalLinguistics.Models
         [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Должны быть только латинские буквы.")]
         public string Content { get; set; }
 
+        [Required(ErrorMessage = "Слово обязательно для заполнения.")]
         public string Tag { get; set; }
+
+        [Required(ErrorMessage = "Слово обязательно для заполнения.")]
+        public string Initial { get; set; }
     }
 }
