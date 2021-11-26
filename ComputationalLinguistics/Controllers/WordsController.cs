@@ -64,8 +64,9 @@ namespace ComputationalLinguistics.Controllers
 
             var model = _mapper.Map<WordViewModel>(wordDto);
             model.WordContextFiles = contextFiles;
-            model.Frequency = frequency;
             model.Forms = wordForms;
+            model.Frequency = frequency;
+            model.AbsoluteFrequency = await _wordService.GetAbsoluteFrequency(wordDto.Content);
 
             return View(model);
         }

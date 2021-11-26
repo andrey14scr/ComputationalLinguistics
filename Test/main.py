@@ -1,10 +1,7 @@
 import nltk
 import json
-from nltk.stem import PorterStemmer
-from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from word_forms.word_forms import get_word_forms
-import inflect
 
 def task(txt):
     parts = nltk.word_tokenize(txt)

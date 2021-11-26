@@ -164,6 +164,8 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
                     var answer = JsonSerializer.Deserialize<List<WordInfoJson>>(answerElement.GetString());
 
+                    WordInfoJson last;
+
                     foreach (var item in answer)
                     {
                         annotatedText += $"{item.Word}[{item.Annotation}] ";
@@ -201,6 +203,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                                     OffSet = item.OffSet + 1,
                                     TextFileId = textId,
                                     WordId = wordInDb.Id,
+                                    //TagPairId = _unitOfWork.TagPairs.GetNoTrackingWhere(tp => tp.CurrentId == )
                                 });
                             }
                         }
@@ -213,6 +216,8 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                                 WordId = wordInList.Id,
                             });
                         }
+
+                        last = item;
                     }
                 }
             }

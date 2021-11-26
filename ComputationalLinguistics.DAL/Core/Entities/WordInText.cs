@@ -13,5 +13,7 @@ namespace ComputationalLinguistics.DAL.Core.Entities
         public int OffSet { get; set; }
         public Guid WordId { get; set; }
         public virtual Word Word { get; set; }
+        public Guid TagPairId { get; set; }
+        public virtual TagPair TagPair { get; set; }
     }
 }

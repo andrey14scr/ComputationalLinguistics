@@ -21,6 +21,7 @@ namespace ComputationalLinguistics.Core.Services.Interfaces
         Task<int> GetWordsCount();
         Task<int> GetWordsInTextsCount();
         Task<WordForms> GetForms(string word);
+        Task<int> GetAbsoluteFrequency(string word);
 
         Task AddNewWords(List<WordDto> toAdd, List<WordInTextDto> wordsInTextToAdd);
     }

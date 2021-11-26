@@ -1,0 +1,35 @@
+﻿@model IEnumerable<TagsPairInfoViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div>
+    <h2 style="float: left">Список пар тэгов</h2>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th class="col-md-1">
+                Тэг
+            </th>
+            <th class="col-md-1">
+                Частота
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="col-md-1">
+                    @(item.Current + " - " + item.Next)
+                </td>
+                <td class="col-md-1">
+                    @item.Frequency
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

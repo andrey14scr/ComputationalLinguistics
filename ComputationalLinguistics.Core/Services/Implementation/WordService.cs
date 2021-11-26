@@ -353,5 +353,19 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             await _unitOfWork.WordsInText.AddRangeAsync(_mapper.Map<List<WordInText>>(wordsInTextToAdd));
             await _unitOfWork.SaveChangesAsync();
         }
+
+        public async Task<int> GetAbsoluteFrequency(string word)
+        {
+            var words = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == word).ToListAsync();
+
+            var absoluteFrequency = 0;
+
+            foreach (var w in words)
+            {
+                absoluteFrequency += await GetFrequency(w.Id);
+            }
+
+            return absoluteFrequency;
+        }
     }
 }

@@ -12,12 +12,12 @@ namespace ComputationalLinguistics.Controllers
 {
     public class HelpController : Controller
     {
-        private readonly ITagHelpService _tagHelpService;
+        private readonly ITagsInfoService _tagsInfoService;
         private readonly IMapper _mapper;
 
-        public HelpController(ITagHelpService tagHelpService, IMapper mapper)
+        public HelpController(ITagsInfoService tagHelpService, IMapper mapper)
         {
-            _tagHelpService = tagHelpService;
+            _tagsInfoService = tagHelpService;
             _mapper = mapper;
         }
 
@@ -28,14 +28,14 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<IActionResult> TagHelp()
         {
-            var allTags = await _tagHelpService.GetAll();
+            var allTags = await _tagsInfoService.GetAll();
             var model = _mapper.Map<IEnumerable<TagInfoModel>>(allTags);
             return View(model.OrderBy(m => m.TagName));
         }
 
         public async Task<IActionResult> GetTagByName(string name)
         {
-            var tagDto = await _tagHelpService.GetByName(name);
+            var tagDto = await _tagsInfoService.GetByName(name);
 
             if (tagDto is null)
             {

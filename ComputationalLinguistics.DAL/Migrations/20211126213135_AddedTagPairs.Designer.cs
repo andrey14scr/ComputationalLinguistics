@@ -4,14 +4,16 @@ using ComputationalLinguistics.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ComputationalLinguistics.DAL.Migrations
 {
     [DbContext(typeof(ComputationalLinguisticsContext))]
-    partial class ComputationalLinguisticsContextModelSnapshot : ModelSnapshot
+    [Migration("20211126213135_AddedTagPairs")]
+    partial class AddedTagPairs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,15 +110,10 @@ namespace ComputationalLinguistics.DAL.Migrations
                     b.Property<int>("OffSet")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("TagPairId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("WordId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("TextFileId", "OffSet");
-
-                    b.HasIndex("TagPairId");
 
                     b.HasIndex(new[] { "TextFileId", "OffSet" }, "ITextFileId");
 
@@ -146,12 +143,6 @@ namespace ComputationalLinguistics.DAL.Migrations
 
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.WordInText", b =>
                 {
-                    b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TagPair", "TagPair")
-                        .WithMany()
-                        .HasForeignKey("TagPairId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TextFile", "TextFile")
                         .WithMany()
                         .HasForeignKey("TextFileId")
@@ -163,8 +154,6 @@ namespace ComputationalLinguistics.DAL.Migrations
                         .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("TagPair");
 
                     b.Navigation("TextFile");
 

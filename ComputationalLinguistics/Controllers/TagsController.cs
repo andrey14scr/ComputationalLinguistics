@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using ComputationalLinguistics.Core.Services.Interfaces;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -7,55 +6,75 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.DAL;
 using ComputationalLinguistics.DAL.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using ComputationalLinguistics.Core.Services.Interfaces;
+using ComputationalLinguistics.Core.Services.Implementation;
+using System.Threading.Tasks;
+using ComputationalLinguistics.Models;
 
 namespace ComputationalLinguistics.Controllers
 {
     public class TagsController : Controller
     {
         private readonly IMapper _mapper;
+        private readonly ITagsInfoService _tagsInfoService;
         private readonly ComputationalLinguisticsContext _context;
 
-        public TagsController(IMapper mapper, ComputationalLinguisticsContext context)
+        public TagsController(IMapper mapper, ITagsInfoService tagsInfoService, ComputationalLinguisticsContext context)
         {
             _mapper = mapper;
+            _tagsInfoService = tagsInfoService;
             _context = context;
         }
 
-        // GET: TagsController
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            var model = _mapper.Map<List<TagInfoDto>>(_context.TagsInfo.ToList());
+            var model = await _tagsInfoService.GetAll();
 
             return View(model);
         }
 
-        // GET: TagsController/Create
+        public async Task<ActionResult> PairsInfo()
+        {
+            var pairs = await _context.TagPairs.Include(u => u.Current).Include(u => u.Next).ToListAsync();
+
+            var model = new List<TagsPairInfoViewModel>();
+
+            foreach (var pair in pairs)
+            {
+                model.Add(new TagsPairInfoViewModel()
+                {
+                    Current = pair.Current.TagName,
+                    Next = pair.Next.TagName,
+                    Frequency = await _context.WordsInText.AsNoTracking().Where(wit => wit.TagPairId == pair.Id).CountAsync(),
+                });
+            }
+
+            return View(model);
+        }
+
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: TagsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(TagInfoDto tagInfoDto)
+        public async Task<ActionResult> CreateAsync(TagInfoDto tagInfoDto)
         {
             try
             {
-                var model = new TagInfo()
+                var model = new TagInfoDto()
                 {
                     Id = Guid.NewGuid(),
                     TagName = tagInfoDto.TagName,
                     Info = tagInfoDto.Info,
                 };
 
-                _context.TagsInfo.Add(model);
-                _context.SaveChanges();
+                await _tagsInfoService.Add(model);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -65,29 +84,26 @@ namespace ComputationalLinguistics.Controllers
             }
         }
 
-        // GET: TagsController/Edit/5
         public ActionResult Edit(Guid id)
         {
-            var model = _mapper.Map<TagInfoDto>(_context.TagsInfo.FirstOrDefault(t => t.Id == id));
+            var model = _tagsInfoService.GetById(id);
             return View(model);
         }
 
-        // POST: TagsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Guid id, TagInfoDto tagInfoDto)
+        public async Task<ActionResult> Edit(Guid id, TagInfoDto tagInfoDto)
         {
             try
             {
-                var model = new TagInfo()
+                var model = new TagInfoDto()
                 {
                     Id = id,
                     TagName = tagInfoDto.TagName,
                     Info = tagInfoDto.Info,
                 };
 
-                _context.TagsInfo.Update(model);
-                _context.SaveChanges();
+                await _tagsInfoService.Update(model);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -97,24 +113,21 @@ namespace ComputationalLinguistics.Controllers
             }
         }
 
-        // GET: TagsController/Delete/5
         public ActionResult Delete(Guid id)
         {
-            var model = _mapper.Map<TagInfoDto>(_context.TagsInfo.FirstOrDefault(t => t.Id == id));
+            var model = _tagsInfoService.GetById(id);
             return View(model);
         }
 
-        // POST: TagsController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(Guid id, IFormCollection collection)
+        public async Task<ActionResult> DeleteAsync(Guid id, IFormCollection collection)
         {
             try
             {
-                var model = _context.TagsInfo.AsNoTracking().FirstOrDefault(t => t.Id == id);
+                var model = await _tagsInfoService.GetById(id);
 
-                _context.TagsInfo.Remove(model);
-                _context.SaveChanges();
+                await _tagsInfoService.Remove(model);
 
                 return RedirectToAction(nameof(Index));
             }
