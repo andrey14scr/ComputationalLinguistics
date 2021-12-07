@@ -23,6 +23,7 @@ namespace ComputationalLinguistics.Tools
             CreateMap<TagInfo, TagInfoModel>().ReverseMap();
             CreateMap<TagInfo, TagInfoDto>().ReverseMap();
             CreateMap<TagInfoModel, TagInfoDto>().ReverseMap();
+            CreateMap<TagInfoDto, TagInfoViewModel>().ReverseMap();
         }
     }
 }

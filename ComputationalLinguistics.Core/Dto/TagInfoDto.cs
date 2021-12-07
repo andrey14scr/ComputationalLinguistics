@@ -9,5 +9,7 @@ namespace ComputationalLinguistics.Core.Dto
         public string TagName { get; set; }
 
         public string Info { get; set; }
+
+        public bool IsGeneric { get; set; }
     }
 }

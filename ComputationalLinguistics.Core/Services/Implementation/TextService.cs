@@ -141,6 +141,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             var textId = textFile.Id;
             var newWords = new List<Word>();
             var wordsInText = new List<WordInText>();
+            var newTagInfos = new List<TagInfo>();
 
             var values = new Dictionary<string, string>
             {
@@ -164,8 +165,6 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
                     var answer = JsonSerializer.Deserialize<List<WordInfoJson>>(answerElement.GetString());
 
-                    WordInfoJson last;
-
                     foreach (var item in answer)
                     {
                         annotatedText += $"{item.Word}[{item.Annotation}] ";
@@ -175,11 +174,29 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                             continue;
                         }
 
-                        var wordInList = newWords.Find(w => w.Content == item.Word.ToLower() && w.Tag == item.Annotation);
+                        var tagInfo = await _unitOfWork.TagsInfo.GetNoTrackingWhere(ti => ti.TagName == item.Annotation)
+                            .FirstOrDefaultAsync();
+
+                        if (tagInfo is null)
+                        {
+                            tagInfo = newTagInfos.Find(ti => ti.TagName == item.Annotation);
+                        }
+
+                        if(tagInfo is null)
+                        {
+                            newTagInfos.Add(tagInfo = new TagInfo
+                            {
+                                Id = Guid.NewGuid(),
+                                TagName = item.Annotation,
+                                Info = "Unknown tag",
+                            });
+                        }
+
+                        var wordInList = newWords.Find(w => w.Content == item.Word.ToLower() && w.TagInfoId == tagInfo.Id);
 
                         if (wordInList is null)
                         {
-                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == item.Word.ToLower() && w.Tag == item.Annotation)
+                            var wordInDb = await _unitOfWork.Words.GetNoTrackingWhere(w => w.Content == item.Word.ToLower() && w.TagInfoId == tagInfo.Id)
                                 .FirstOrDefaultAsync();
                             if (wordInDb is null)
                             {
@@ -187,10 +204,11 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                                 {
                                     Id = Guid.NewGuid(),
                                     Content = item.Word.ToLower(), 
-                                    Tag = item.Annotation.ToUpper(),
+                                    TagInfoId = tagInfo.Id,
                                 });
                                 wordsInText.Add(new WordInText
                                 {
+                                    Id = Guid.NewGuid(),
                                     OffSet = item.OffSet + 1,
                                     TextFileId = textId,
                                     WordId = newWords[^1].Id,
@@ -200,10 +218,10 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                             {
                                 wordsInText.Add(new WordInText
                                 {
+                                    Id = Guid.NewGuid(),
                                     OffSet = item.OffSet + 1,
                                     TextFileId = textId,
                                     WordId = wordInDb.Id,
-                                    //TagPairId = _unitOfWork.TagPairs.GetNoTrackingWhere(tp => tp.CurrentId == )
                                 });
                             }
                         }
@@ -211,19 +229,24 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                         {
                             wordsInText.Add(new WordInText
                             {
+                                Id = Guid.NewGuid(),
                                 OffSet = item.OffSet + 1,
                                 TextFileId = textId,
                                 WordId = wordInList.Id,
                             });
                         }
 
-                        last = item;
+                        if (wordsInText.Count > 1)
+                        {
+                            wordsInText[^2].NextWordInTextId = wordsInText[^1].Id;
+                        }
                     }
                 }
             }
 
             File.WriteAllText(textFile.FileAnnotationPath, annotatedText);
 
+            await _unitOfWork.TagsInfo.AddRangeAsync(newTagInfos);
             await _unitOfWork.WordsInText.AddRangeAsync(wordsInText);
             await _unitOfWork.Words.AddRangeAsync(newWords);
             await _unitOfWork.SaveChangesAsync();

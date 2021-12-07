@@ -8,17 +8,20 @@ using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.Models;
 using ComputationalLinguistics.Tools;
+using ComputationalLinguistics.DAL.Core.Entities;
 
 namespace ComputationalLinguistics.Controllers
 {
     public class WordsController : Controller
     {
         private readonly IWordService _wordService;
+        private readonly ITagsInfoService _tagsInfoService;
         private readonly IMapper _mapper;
 
-        public WordsController(IWordService wordService, IMapper mapper)
+        public WordsController(IWordService wordService, ITagsInfoService tagsInfoService, IMapper mapper)
         {
             _wordService = wordService;
+            _tagsInfoService = tagsInfoService;
             _mapper = mapper;
         }
 
@@ -85,11 +88,18 @@ namespace ComputationalLinguistics.Controllers
             {
                 try
                 {
+                    var tagInfo = await _tagsInfoService.GetByName(createWordModel.TagName);
+
+                    if (tagInfo is null)
+                    {
+                        throw new Exception($"Нет такого тэга \"{createWordModel.TagName}\".");
+                    }
+
                     wordDto = new WordDto
                     {
                         Id = Guid.NewGuid(),
                         Content = createWordModel.Content, 
-                        Tag = createWordModel.Tag, 
+                        TagInfoId = tagInfo.Id, 
                         Initial = createWordModel.Initial,
                     };
                     await _wordService.Add(wordDto);
@@ -135,11 +145,18 @@ namespace ComputationalLinguistics.Controllers
             {
                 try
                 {
+                    var tagInfo = await _tagsInfoService.GetByName(wvm.WordViewModel.TagName);
+
+                    if (tagInfo is null)
+                    {
+                        throw new Exception($"Нет такого тэга \"{wvm.WordViewModel.TagName}\".");
+                    }
+
                     await _wordService.Update(new WordDto
                     {
                         Id = wvm.WordViewModel.Id,
                         Content = wvm.WordViewModel.Content,
-                        Tag = wvm.WordViewModel.Tag, 
+                        TagInfoId = tagInfo.Id, 
                         Initial = wvm.WordViewModel.Initial,
                     });
                 }
@@ -198,7 +215,7 @@ namespace ComputationalLinguistics.Controllers
                     break;
                 case Variables.OnAnnotationPattern:
                     if (!string.IsNullOrWhiteSpace(pattern))
-                        words = await _wordService.SortBy(w => w.Tag.Substring(0, pattern.Length) == pattern.ToUpper(), w => w.Tag, skip, next);
+                        words = await _wordService.SortBy(w => w.TagInfo.TagName.Substring(0, pattern.Length) == pattern.ToUpper(), w => w.TagInfo.TagName, skip, next);
                     break;
                 case Variables.OnAlphabetBackPattern:
                     words = await _wordService.GetSortedBy(w => w.Content, skip, next);

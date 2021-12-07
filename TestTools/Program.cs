@@ -28,36 +28,10 @@ namespace TestTools
 
     class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
-            var values = new Dictionary<string, string>
-            {
-                { "text", "I accepted         your answer   as good because    it         is much more simpler and it is clearer and simpler." },
-            };
-
-            var content = new FormUrlEncodedContent(values);
-
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var response = await httpClient.PostAsync("http://127.0.0.1:5000/texts?", content);
-
-                var responseString = await response.Content.ReadAsStringAsync();
-
-                using (var doc = JsonDocument.Parse(responseString))
-                {
-                    var root = doc.RootElement;
-                    var answerElement = root.GetProperty("answer");
-
-                    var answer = JsonSerializer.Deserialize<List<WordInfoJson>>(answerElement.GetString());
-
-                    foreach (var item in answer)
-                    {
-                        Console.WriteLine(item.Word);
-                    }
-                }
-            }
+            var emptyTag = Guid.Parse("00000000000000000000000000000001");
+            Console.WriteLine(emptyTag);
         }
     }
 }

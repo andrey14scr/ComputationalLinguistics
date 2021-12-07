@@ -48,7 +48,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
         public async Task Add(WordDto wordDto)
         {
-            if (_unitOfWork.TagsInfo.GetNoTrackingWhere(t => t.TagName == wordDto.Tag).FirstOrDefault() is null)
+            if (_unitOfWork.TagsInfo.GetNoTrackingWhere(ti => ti.Id == wordDto.TagInfoId).FirstOrDefault() is null)
             {
                 throw new Exception("Нет такого тэга");
             }
@@ -92,7 +92,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Id = w.Id,
                     Content = w.Content,
                     Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id), 
-                    Tag = w.Tag,
+                    TagName = w.TagInfo.TagName,
                 })
                 .ToListAsync();
 
@@ -108,7 +108,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Id = w.Id,
                     Content = w.Content,
                     Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id),
-                    Tag = w.Tag,
+                    TagName = w.TagInfo.TagName,
                 });
 
             var words = isDesc
@@ -122,6 +122,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         public async Task<IEnumerable<WordWithFrequencyDto>> SortBy<T>(Expression<Func<Word, bool>> predicate,Expression<Func<Word, T>> keySelector, int skip, int take)
         {
             var words = await _unitOfWork.Words.GetNoTrackingWhere(predicate)
+                .Include(w => w.TagInfo)
                 .OrderBy(keySelector)
                 .Skip(skip)
                 .Take(take)
@@ -130,7 +131,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Id = w.Id,
                     Content = w.Content,
                     Frequency = _unitOfWork.WordsInText.GetNoTracking().Count(wt => wt.WordId == w.Id),
-                    Tag = w.Tag,
+                    TagName = w.TagInfo.TagName,
                 })
                 .ToListAsync();
             
@@ -139,7 +140,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
         public async Task Update(WordDto wordDto)
         {
-            if (_unitOfWork.TagsInfo.GetNoTrackingWhere(t => t.TagName == wordDto.Tag).FirstOrDefault() is null)
+            if (_unitOfWork.TagsInfo.GetNoTrackingWhere(t => t.Id == wordDto.TagInfoId).FirstOrDefault() is null)
             {
                 throw new Exception("Нет такого тэга");
             }
@@ -229,10 +230,10 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 }
             }
 
-            if (newWord.Content != oldWord.Content || newWord.Tag != oldWord.Tag)
+            if (newWord.Content != oldWord.Content || newWord.TagInfoId != oldWord.TagInfoId)
             {
                 var sameWord = await _unitOfWork.Words
-                    .GetNoTrackingWhere(w => w.Content == newWord.Content && w.Tag == newWord.Tag)
+                    .GetNoTrackingWhere(w => w.Content == newWord.Content && w.TagInfoId == newWord.TagInfoId)
                     .FirstOrDefaultAsync();
 
                 if (sameWord is not null)

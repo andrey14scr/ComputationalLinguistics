@@ -32,7 +32,6 @@ namespace ComputationalLinguistics
             services.AddTransient<IRepository<WordInText>, WordInTextRepository>();
             services.AddTransient<IRepository<TextFile>, TextFileRepository>();
             services.AddTransient<IRepository<TagInfo>, TagInfoRepository>();
-            services.AddTransient<IRepository<TagPair>, TagPairsRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IWordService, WordService>();
             services.AddScoped<ITextService, TextService>();

@@ -8,12 +8,17 @@ namespace ComputationalLinguistics.DAL.Core.Entities
     [Index(nameof(TextFileId), nameof(OffSet), Name = "ITextFileId")]
     public class WordInText
     {
+        public Guid Id { get; set; }
+
         public Guid TextFileId { get; set; }
         public virtual TextFile TextFile { get; set; }
+        
         public int OffSet { get; set; }
+        
         public Guid WordId { get; set; }
         public virtual Word Word { get; set; }
-        public Guid TagPairId { get; set; }
-        public virtual TagPair TagPair { get; set; }
+        
+        public Guid? NextWordInTextId { get; set; }
+        public virtual WordInText NextWordInText { get; set; }
     }
 }

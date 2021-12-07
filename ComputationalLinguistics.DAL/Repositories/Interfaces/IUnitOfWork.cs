@@ -9,7 +9,6 @@ namespace ComputationalLinguistics.DAL.Repositories.Interfaces
         IRepository<TextFile> TextFiles { get; }
         IRepository<WordInText> WordsInText { get; }
         IRepository<TagInfo> TagsInfo { get; }
-        IRepository<TagPair> TagPairs { get; }
 
         Task<int> SaveChangesAsync();
     }

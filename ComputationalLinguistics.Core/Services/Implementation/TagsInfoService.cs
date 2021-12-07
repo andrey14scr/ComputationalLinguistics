@@ -96,5 +96,12 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             _unitOfWork.TagsInfo.Update(tagInfo);
             await _unitOfWork.SaveChangesAsync();
         }
+
+        public async Task<int> GetCountByTagsName(string tagName)
+        {
+            var tagInfo = await _unitOfWork.TagsInfo.GetNoTrackingWhere(ti => ti.TagName == tagName).FirstOrDefaultAsync();
+
+            return await _unitOfWork.Words.GetNoTrackingWhere(w => w.TagInfoId == tagInfo.Id).CountAsync();
+        }
     }
 }

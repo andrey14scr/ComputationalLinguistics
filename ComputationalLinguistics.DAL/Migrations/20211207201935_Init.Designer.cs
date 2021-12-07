@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ComputationalLinguistics.DAL.Migrations
 {
     [DbContext(typeof(ComputationalLinguisticsContext))]
-    [Migration("20211024193350_AddAnnotation")]
-    partial class AddAnnotation
+    [Migration("20211207201935_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,11 +21,36 @@ namespace ComputationalLinguistics.DAL.Migrations
                 .HasAnnotation("ProductVersion", "5.0.10")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.TagInfo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Info")
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsGeneric")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TagName")
+                        .HasColumnType("nvarchar(10)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex(new[] { "TagName" }, "ITagName");
+
+                    b.ToTable("TagsInfo");
+                });
+
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.TextFile", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FileAnnotationPath")
+                        .HasColumnType("nvarchar(220)");
 
                     b.Property<string>("FilePath")
                         .HasColumnType("nvarchar(200)");
@@ -43,31 +68,45 @@ namespace ComputationalLinguistics.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Annotation")
-                        .HasColumnType("nvarchar(10)");
-
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(120)");
 
+                    b.Property<string>("Initial")
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<Guid>("TagInfoId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "Content", "Annotation" }, "IWordInfo");
+                    b.HasIndex("TagInfoId");
+
+                    b.HasIndex(new[] { "Content", "TagInfoId" }, "IWordInfo");
 
                     b.ToTable("Words");
                 });
 
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.WordInText", b =>
                 {
-                    b.Property<Guid>("TextFileId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("NextWordInTextId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("OffSet")
                         .HasColumnType("int");
 
+                    b.Property<Guid>("TextFileId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("WordId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("TextFileId", "OffSet");
+                    b.HasKey("Id");
+
+                    b.HasIndex("NextWordInTextId");
 
                     b.HasIndex(new[] { "TextFileId", "OffSet" }, "ITextFileId");
 
@@ -76,8 +115,23 @@ namespace ComputationalLinguistics.DAL.Migrations
                     b.ToTable("WordsInText");
                 });
 
+            modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.Word", b =>
+                {
+                    b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TagInfo", "TagInfo")
+                        .WithMany()
+                        .HasForeignKey("TagInfoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TagInfo");
+                });
+
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.WordInText", b =>
                 {
+                    b.HasOne("ComputationalLinguistics.DAL.Core.Entities.WordInText", "NextWordInText")
+                        .WithMany()
+                        .HasForeignKey("NextWordInTextId");
+
                     b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TextFile", "TextFile")
                         .WithMany()
                         .HasForeignKey("TextFileId")
@@ -89,6 +143,8 @@ namespace ComputationalLinguistics.DAL.Migrations
                         .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("NextWordInText");
 
                     b.Navigation("TextFile");
 

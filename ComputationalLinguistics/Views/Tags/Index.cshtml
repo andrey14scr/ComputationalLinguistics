@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ComputationalLinguistics.Core.Dto.TagInfoDto>
+﻿@model IEnumerable<TagInfoViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -21,6 +21,9 @@
                 Описание
             </th>
             <th class="col-md-1">
+                Частота
+            </th>
+            <th class="col-md-1">
                 Действие
             </th>
         </tr>
@@ -35,11 +38,19 @@
             <td class="col-md-3 tag-tooltip">
                 @item.Info
             </td>
+            <td class="col-md-3 tag-tooltip">
+                @item.Frequency
+            </td>
             <td class="col-md-5">
-                <a asp-action="Edit" asp-route-id="@item.Id"><input type="button" value="Редактировать" class="btn-secondary" /></a>
-                <a asp-action="Delete" asp-route-id="@item.Id"><input type="button" value="Удалить" class="btn-danger" /></a>
+                @if (!item.IsGeneric)
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id"><input type="button" value="Редактировать" class="btn-secondary" /></a>
+                    <a asp-action="Delete" asp-route-id="@item.Id"><input type="button" value="Удалить" class="btn-danger" /></a>   
+                }
             </td>
         </tr>
     }
     </tbody>
 </table>
+<br />
+<a asp-action="PairsInfo">Пары тэгов</a>

@@ -15,5 +15,6 @@ namespace ComputationalLinguistics.DAL.Core.Entities
 
         [Column(TypeName = "nvarchar(200)")]
         public string Info { get; set; }
+        public bool IsGeneric { get; set; }
     }
 }

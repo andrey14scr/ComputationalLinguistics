@@ -32,28 +32,35 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<ActionResult> Index()
         {
-            var model = await _tagsInfoService.GetAll();
+            var tagDtos = await _tagsInfoService.GetAll();
+            var model = _mapper.Map<List<TagInfoViewModel>>(tagDtos);
+
+            foreach (var ti in model)
+            {
+                ti.Frequency = await _tagsInfoService.GetCountByTagsName(ti.TagName);
+            }
 
             return View(model);
         }
 
         public async Task<ActionResult> PairsInfo()
         {
-            var pairs = await _context.TagPairs.Include(u => u.Current).Include(u => u.Next).ToListAsync();
-
-            var model = new List<TagsPairInfoViewModel>();
-
-            foreach (var pair in pairs)
-            {
-                model.Add(new TagsPairInfoViewModel()
+            var pairs = await _context.WordsInText
+                .Where(wit => wit.NextWordInTextId.HasValue)
+                .GroupBy(wit => new
                 {
-                    Current = pair.Current.TagName,
-                    Next = pair.Next.TagName,
-                    Frequency = await _context.WordsInText.AsNoTracking().Where(wit => wit.TagPairId == pair.Id).CountAsync(),
-                });
-            }
+                    FirstTag = wit.Word.TagInfo.TagName,
+                    SecondTag = wit.NextWordInText.Word.TagInfo.TagName,
+                })
+                .Select(group => new TagPairViewModel
+                {
+                    FirstTag = group.Key.FirstTag, 
+                    SecondTag = group.Key.SecondTag,
+                    Frequency = group.Count()
+                })
+                .ToListAsync();
 
-            return View(model);
+            return View(pairs);
         }
 
         public ActionResult Create()
@@ -71,7 +78,8 @@ namespace ComputationalLinguistics.Controllers
                 {
                     Id = Guid.NewGuid(),
                     TagName = tagInfoDto.TagName,
-                    Info = tagInfoDto.Info,
+                    Info = tagInfoDto.Info, 
+                    IsGeneric = false,
                 };
 
                 await _tagsInfoService.Add(model);
@@ -84,9 +92,9 @@ namespace ComputationalLinguistics.Controllers
             }
         }
 
-        public ActionResult Edit(Guid id)
+        public async Task<ActionResult> Edit(Guid id)
         {
-            var model = _tagsInfoService.GetById(id);
+            var model = await _tagsInfoService.GetById(id);
             return View(model);
         }
 
@@ -113,9 +121,9 @@ namespace ComputationalLinguistics.Controllers
             }
         }
 
-        public ActionResult Delete(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
-            var model = _tagsInfoService.GetById(id);
+            var model = await _tagsInfoService.GetById(id);
             return View(model);
         }
 

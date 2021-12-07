@@ -9,7 +9,7 @@ namespace ComputationalLinguistics.Models
         public string Content { get; set; }
 
         [Required(ErrorMessage = "Слово обязательно для заполнения.")]
-        public string Tag { get; set; }
+        public string TagName { get; set; }
 
         [Required(ErrorMessage = "Слово обязательно для заполнения.")]
         public string Initial { get; set; }

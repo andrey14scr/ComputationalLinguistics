@@ -6,7 +6,7 @@ namespace ComputationalLinguistics.Core.Dto
     {
         public Guid Id { get; set; }
         public string Content { get; set; }
-        public string Tag { get; set; }
+        public string TagName { get; set; }
         public int Frequency { get; set; }
         public string Initial { get; set; }
     }

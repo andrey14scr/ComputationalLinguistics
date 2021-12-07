@@ -28,6 +28,9 @@ namespace ComputationalLinguistics.DAL.Migrations
                     b.Property<string>("Info")
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<bool>("IsGeneric")
+                        .HasColumnType("bit");
+
                     b.Property<string>("TagName")
                         .HasColumnType("nvarchar(10)");
 
@@ -36,27 +39,6 @@ namespace ComputationalLinguistics.DAL.Migrations
                     b.HasIndex(new[] { "TagName" }, "ITagName");
 
                     b.ToTable("TagsInfo");
-                });
-
-            modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.TagPair", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CurrentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("NextId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentId");
-
-                    b.HasIndex("NextId");
-
-                    b.ToTable("TagPairs");
                 });
 
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.TextFile", b =>
@@ -90,33 +72,39 @@ namespace ComputationalLinguistics.DAL.Migrations
                     b.Property<string>("Initial")
                         .HasColumnType("nvarchar(120)");
 
-                    b.Property<string>("Tag")
-                        .HasColumnType("nvarchar(10)");
+                    b.Property<Guid>("TagInfoId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "Content", "Tag" }, "IWordInfo");
+                    b.HasIndex("TagInfoId");
+
+                    b.HasIndex(new[] { "Content", "TagInfoId" }, "IWordInfo");
 
                     b.ToTable("Words");
                 });
 
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.WordInText", b =>
                 {
-                    b.Property<Guid>("TextFileId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("NextWordInTextId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("OffSet")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("TagPairId")
+                    b.Property<Guid>("TextFileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("WordId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("TextFileId", "OffSet");
+                    b.HasKey("Id");
 
-                    b.HasIndex("TagPairId");
+                    b.HasIndex("NextWordInTextId");
 
                     b.HasIndex(new[] { "TextFileId", "OffSet" }, "ITextFileId");
 
@@ -125,32 +113,22 @@ namespace ComputationalLinguistics.DAL.Migrations
                     b.ToTable("WordsInText");
                 });
 
-            modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.TagPair", b =>
+            modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.Word", b =>
                 {
-                    b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TagInfo", "Current")
+                    b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TagInfo", "TagInfo")
                         .WithMany()
-                        .HasForeignKey("CurrentId")
+                        .HasForeignKey("TagInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TagInfo", "Next")
-                        .WithMany()
-                        .HasForeignKey("NextId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Current");
-
-                    b.Navigation("Next");
+                    b.Navigation("TagInfo");
                 });
 
             modelBuilder.Entity("ComputationalLinguistics.DAL.Core.Entities.WordInText", b =>
                 {
-                    b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TagPair", "TagPair")
+                    b.HasOne("ComputationalLinguistics.DAL.Core.Entities.WordInText", "NextWordInText")
                         .WithMany()
-                        .HasForeignKey("TagPairId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("NextWordInTextId");
 
                     b.HasOne("ComputationalLinguistics.DAL.Core.Entities.TextFile", "TextFile")
                         .WithMany()
@@ -164,7 +142,7 @@ namespace ComputationalLinguistics.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("TagPair");
+                    b.Navigation("NextWordInText");
 
                     b.Navigation("TextFile");
 

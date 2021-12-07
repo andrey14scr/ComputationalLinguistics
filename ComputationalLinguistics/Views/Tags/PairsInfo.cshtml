@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TagsPairInfoViewModel>
+﻿@model IEnumerable<TagPairViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -24,7 +24,7 @@
         {
             <tr>
                 <td class="col-md-1">
-                    @(item.Current + " - " + item.Next)
+                    @(item.FirstTag + " - " + item.SecondTag)
                 </td>
                 <td class="col-md-1">
                     @item.Frequency
