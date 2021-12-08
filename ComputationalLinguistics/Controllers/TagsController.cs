@@ -70,15 +70,15 @@ namespace ComputationalLinguistics.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreateAsync(TagInfoDto tagInfoDto)
+        public async Task<ActionResult> CreateAsync(CreateTagModel createTagModel)
         {
             try
             {
                 var model = new TagInfoDto()
                 {
                     Id = Guid.NewGuid(),
-                    TagName = tagInfoDto.TagName,
-                    Info = tagInfoDto.Info, 
+                    TagName = createTagModel.TagName,
+                    Info = createTagModel.Info, 
                     IsGeneric = false,
                 };
 

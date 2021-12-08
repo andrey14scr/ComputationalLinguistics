@@ -165,12 +165,20 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
                     var answer = JsonSerializer.Deserialize<List<WordInfoJson>>(answerElement.GetString());
 
+                    var isEnd = false;
+                    var endPattern = ".!?;";
+
                     foreach (var item in answer)
                     {
                         annotatedText += $"{item.Word}[{item.Annotation}] ";
 
                         if (item.Word.Any(x => !char.IsLetter(x)))
                         {
+                            if (endPattern.Contains(item.Word))
+                            {
+                                isEnd = true;
+                            }
+
                             continue;
                         }
 
@@ -182,7 +190,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                             tagInfo = newTagInfos.Find(ti => ti.TagName == item.Annotation);
                         }
 
-                        if(tagInfo is null)
+                        if (tagInfo is null)
                         {
                             newTagInfos.Add(tagInfo = new TagInfo
                             {
@@ -238,7 +246,15 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
                         if (wordsInText.Count > 1)
                         {
-                            wordsInText[^2].NextWordInTextId = wordsInText[^1].Id;
+                            if (isEnd)
+                            {
+                                wordsInText[^2].NextWordInTextId = null;
+                                isEnd = false;
+                            }
+                            else
+                            {
+                                wordsInText[^2].NextWordInTextId = wordsInText[^1].Id;
+                            }
                         }
                     }
                 }

@@ -30,8 +30,8 @@ namespace TestTools
     {
         static void Main(string[] args)
         {
-            var emptyTag = Guid.Parse("00000000000000000000000000000001");
-            Console.WriteLine(emptyTag);
+            var endPattern = ".?!;";
+            Console.WriteLine(endPattern.Contains(","));
         }
     }
 }
