@@ -69,31 +69,19 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         {
             var word = _mapper.Map<Word>(wordDto);
 
-            var pairs = await _unitOfWork.WordsInText.GetNoTracking()
+            var wordsInText = await _unitOfWork.WordsInText.GetNoTracking()
                 .Include(wit => wit.NextWordInText)
                 .Include(wit => wit.NextWordInText.Word)
                 .Where(wit => wit.NextWordInText.Word.Id == word.Id)
-                .Select(p => new WordsInTextPair
-                {
-                    First = p,
-                    Second = p.NextWordInText
-                })
                 .ToListAsync();
 
-            var toUpdate = new List<WordInText>(pairs.Count * 2);
-
-            foreach (var pair in pairs)
+            foreach (var wordInText in wordsInText)
             {
-                pair.First.NextWordInTextId = null;
-                pair.Second.NextWordInTextId = null;
-                pair.First.NextWordInText = null;
-                pair.Second.NextWordInText = null;
-
-                toUpdate.Add(pair.First);
-                toUpdate.Add(pair.Second);
+                wordInText.NextWordInTextId = null;
+                wordInText.NextWordInText = null;
             }
 
-            _unitOfWork.WordsInText.UpdateRange(toUpdate);
+            _unitOfWork.WordsInText.UpdateRange(wordsInText);
             await _unitOfWork.SaveChangesAsync();
             _unitOfWork.Words.Remove(word);
             await _unitOfWork.SaveChangesAsync();

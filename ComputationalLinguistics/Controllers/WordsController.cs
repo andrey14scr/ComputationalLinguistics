@@ -9,6 +9,7 @@ using ComputationalLinguistics.Core.Services.Interfaces;
 using ComputationalLinguistics.Models;
 using ComputationalLinguistics.Tools;
 using ComputationalLinguistics.DAL.Core.Entities;
+using ComputationalLinguistics.Core.Models;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -185,6 +186,12 @@ namespace ComputationalLinguistics.Controllers
             model.TagName = tagInfo.TagName;
             model.Frequency = await _wordService.GetFrequency(id);
             model.AbsoluteFrequency = await _wordService.GetAbsoluteFrequency(wordDto.Content);
+            if (string.IsNullOrWhiteSpace(wordDto.Initial))
+            {
+                var wordForms = await _wordService.GetForms(wordDto.Content);
+                model.Initial = wordForms.Initial;
+                await _wordService.Update(wordDto);
+            }
 
             return View(new WordViewModelFrom() { PreviousPage = previousPage, WordViewModel = model });
         }
