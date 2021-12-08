@@ -58,6 +58,7 @@ namespace ComputationalLinguistics.Controllers
 
             var contextFiles = await _wordService.GetContextFiles(id.Value);
             var wordForms = await _wordService.GetForms(wordDto.Content);
+            var tagInfo = await _tagsInfoService.GetById(wordDto.TagInfoId);
 
             if (string.IsNullOrWhiteSpace(wordDto.Initial))
             {
@@ -70,6 +71,7 @@ namespace ComputationalLinguistics.Controllers
             model.Forms = wordForms;
             model.Frequency = frequency;
             model.AbsoluteFrequency = await _wordService.GetAbsoluteFrequency(wordDto.Content);
+            model.TagName = tagInfo.TagName;
 
             return View(model);
         }
@@ -132,7 +134,9 @@ namespace ComputationalLinguistics.Controllers
                 await _wordService.Update(wordDto);
             }
 
+            var tagInfo = await _tagsInfoService.GetById(wordDto.TagInfoId);
             var model = _mapper.Map<WordViewModel>(wordDto);
+            model.TagName = tagInfo.TagName;
 
             return View(new WordViewModelFrom { PreviousPage = previousPage, WordViewModel = model });
         }
