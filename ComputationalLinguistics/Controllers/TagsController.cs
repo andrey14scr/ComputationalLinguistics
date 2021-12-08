@@ -58,7 +58,25 @@ namespace ComputationalLinguistics.Controllers
                 })
                 .ToListAsync();
 
-            return View(pairs);
+            var all = await _tagsInfoService.GetAll();
+
+            foreach (var first in all)
+            {
+                foreach (var second in all)
+                {
+                    if (!pairs.Exists(p => p.FirstTag == first.TagName && p.SecondTag == second.TagName))
+                    {
+                        pairs.Add(new TagPairViewModel
+                        {
+                            FirstTag = first.TagName,
+                            SecondTag = second.TagName,
+                            Frequency = 0,
+                        });
+                    }
+                }
+            }
+
+            return View(pairs.OrderByDescending(p => p.Frequency));
         }
 
         public ActionResult Create()
