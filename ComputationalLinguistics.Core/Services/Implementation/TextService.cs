@@ -137,6 +137,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
             var annotatedText = string.Empty;
             var fileContent = await File.ReadAllTextAsync(fileName);
+            fileContent = fileContent.Replace("\r", "");
             
             var textId = textFile.Id;
             var newWords = new List<Word>();

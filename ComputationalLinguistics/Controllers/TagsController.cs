@@ -20,13 +20,11 @@ namespace ComputationalLinguistics.Controllers
     {
         private readonly IMapper _mapper;
         private readonly ITagsInfoService _tagsInfoService;
-        private readonly ComputationalLinguisticsContext _context;
 
-        public TagsController(IMapper mapper, ITagsInfoService tagsInfoService, ComputationalLinguisticsContext context)
+        public TagsController(IMapper mapper, ITagsInfoService tagsInfoService)
         {
             _mapper = mapper;
             _tagsInfoService = tagsInfoService;
-            _context = context;
         }
 
         public async Task<ActionResult> Index(string sortBy, string pattern)
