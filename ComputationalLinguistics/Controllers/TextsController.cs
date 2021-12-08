@@ -52,7 +52,7 @@ namespace ComputationalLinguistics.Controllers
 
                     if (System.IO.File.Exists(path))
                     {
-                        path = Path.Combine(TextFilesFolder, $"Copy_{DateTime.Now:MM/dd/yyyy_HH/mm/ss}_", uploadedFile.FileName);
+                        System.IO.File.Delete(path);
                     }
 
                     try
@@ -86,40 +86,6 @@ namespace ComputationalLinguistics.Controllers
             }
 
             await _textService.ParseText(textFileDto.FilePath);
-        }
-
-        public async Task Parse(IFormFile uploadedFile)
-        {
-            var exceptions = new List<Exception>();
-
-            if (!Directory.Exists(TextFilesFolder))
-            {
-                Directory.CreateDirectory(TextFilesFolder);
-            }
-
-            if (uploadedFile is not null)
-            {
-                var path = Path.Combine(TextFilesFolder, uploadedFile.FileName);
-
-                if (System.IO.File.Exists(path))
-                {
-                    path = Path.Combine(TextFilesFolder, $"Copy_{DateTime.Now:MM/dd/yyyy_HH/mm/ss}_", uploadedFile.FileName);
-                }
-
-                try
-                {
-                    await using (var fileStream = new FileStream(path, FileMode.CreateNew))
-                    {
-                        await uploadedFile.CopyToAsync(fileStream);
-                    }
-
-                    //await _textService.ParseText(path);
-                }
-                catch (Exception ex)
-                {
-                    exceptions.Add(ex);
-                }
-            }
         }
 
         public async Task<IActionResult> Details(Guid id, Guid? wordId)
