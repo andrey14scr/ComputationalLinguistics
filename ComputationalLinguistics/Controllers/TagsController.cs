@@ -41,42 +41,50 @@ namespace ComputationalLinguistics.Controllers
             });
         }
 
-        public async Task<ActionResult> PairsInfo()
+        public async Task<ActionResult> PairsInfo(string sortBy, string pattern)
         {
-            var pairs = await _context.WordsInText
-                .Where(wit => wit.NextWordInTextId.HasValue)
-                .GroupBy(wit => new
-                {
-                    FirstTag = wit.Word.TagInfo.TagName,
-                    SecondTag = wit.NextWordInText.Word.TagInfo.TagName,
-                })
-                .Select(group => new TagPairViewModel
-                {
-                    FirstTag = group.Key.FirstTag, 
-                    SecondTag = group.Key.SecondTag,
-                    Frequency = group.Count()
-                })
-                .ToListAsync();
+            IEnumerable<TagPairDto> pairs = new List<TagPairDto>();
 
-            var all = await _tagsInfoService.GetAll();
-
-            foreach (var first in all)
+            switch (sortBy)
             {
-                foreach (var second in all)
-                {
-                    if (!pairs.Exists(p => p.FirstTag == first.TagName && p.SecondTag == second.TagName))
+                case Variables.OnFrequencyPattern:
+                    pairs = await _tagsInfoService.GetPairs(p => true, p => p.Frequency);
+                    break;
+                case Variables.OnFrequencyBackPattern:
+                    pairs = await _tagsInfoService.GetPairs(p => true, p => p.Frequency, false);
+                    break;
+                case Variables.OnPatternPattern:
+                    if (!string.IsNullOrWhiteSpace(pattern))
                     {
-                        pairs.Add(new TagPairViewModel
+                        while (pattern.Contains("  "))
                         {
-                            FirstTag = first.TagName,
-                            SecondTag = second.TagName,
-                            Frequency = 0,
-                        });
+                            pattern = pattern.Replace("  ", " ");
+                        }
+
+                        var patterns = pattern.Trim().Split(' ');
+                        if (patterns.Length == 2 && !string.IsNullOrWhiteSpace(patterns[0]) && !string.IsNullOrWhiteSpace(patterns[1]))
+                        {
+                            pairs = await _tagsInfoService.GetPairs(p => 
+                                p.FirstTag.Substring(0, patterns[0].Length) == patterns[0] &&
+                                p.SecondTag.Substring(0, patterns[1].Length) == patterns[1], 
+                                p => string.Concat(p.FirstTag, p.SecondTag));
+                        }
                     }
-                }
+                    break;
+                case Variables.OnAlphabetBackPattern:
+                    pairs = await _tagsInfoService.GetPairs(p => true, p => string.Concat(p.FirstTag, p.SecondTag));
+                    break;
+                default:
+                    pairs = await _tagsInfoService.GetPairs(p => true, p => string.Concat(p.FirstTag, p.SecondTag), false);
+                    break;
             }
 
-            return View(pairs.OrderByDescending(p => p.Frequency));
+            return View(new TagPairsListViewModel
+            {
+                TagPairs = _mapper.Map<List<TagPairModel>>(pairs), 
+                Pattern = pattern, 
+                SortBy = sortBy,
+            });
         }
 
         public ActionResult Create()
@@ -178,10 +186,10 @@ namespace ComputationalLinguistics.Controllers
                         tags = await _tagsInfoService.SortBy(t => t.TagName.Substring(0, pattern.Length) == pattern, w => w.TagName);
                     break;
                 case Variables.OnAlphabetBackPattern:
-                    tags = await _tagsInfoService.GetSortedBy(t => t.TagName);
+                    tags = await _tagsInfoService.GetSortedBy(t => t.TagName, false);
                     break;
                 default:
-                    tags = await _tagsInfoService.GetSortedBy(t => t.TagName, false);
+                    tags = await _tagsInfoService.GetSortedBy(t => t.TagName);
                     break;
             }
 

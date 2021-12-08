@@ -162,5 +162,58 @@ namespace ComputationalLinguistics.Core.Services.Implementation
 
             return tags;
         }
+
+        public async Task<IEnumerable<TagPairDto>> GetPairs<T>(Func<TagPairDto, bool> predicate, Func<TagPairDto, T> keySelector, bool isDesc = true)
+        {
+            var pairs = _unitOfWork.WordsInText
+                .GetNoTrackingWhere(wit => wit.NextWordInTextId.HasValue)
+                .GroupBy(wit => new
+                {
+                    FirstTag = wit.Word.TagInfo.TagName,
+                    SecondTag = wit.NextWordInText.Word.TagInfo.TagName,
+                })
+                .Select(group => new TagPairDto
+                {
+                    FirstTag = group.Key.FirstTag,
+                    SecondTag = group.Key.SecondTag,
+                    Frequency = group.Count()
+                })
+                .Where(predicate)
+                .ToList();
+
+            var all = await GetAll();
+
+            foreach (var first in all)
+            {
+                foreach (var second in all)
+                {
+                    if (!pairs.Exists(p => p.FirstTag == first.TagName && p.SecondTag == second.TagName))
+                    {
+                        var pair = new TagPairDto
+                        {
+                            FirstTag = first.TagName,
+                            SecondTag = second.TagName,
+                            Frequency = 0,
+                        };
+
+                        if (predicate(pair))
+                        {
+                            pairs.Add(pair);
+                        }
+                    }
+                }
+            }
+
+            if (!isDesc)
+            {
+                pairs = pairs.OrderBy(keySelector).ToList();
+            }
+            else
+            {
+                pairs = pairs.OrderByDescending(keySelector).ToList();
+            }
+
+            return pairs;
+        }
     }
 }

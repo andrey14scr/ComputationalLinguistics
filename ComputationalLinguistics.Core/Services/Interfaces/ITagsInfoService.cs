@@ -12,6 +12,7 @@ namespace ComputationalLinguistics.Core.Services.Interfaces
     {
         Task<TagInfoDto> GetByName(string name);
         Task<int> GetCountByTagsName(string tagName);
+        Task<IEnumerable<TagPairDto>> GetPairs<T>(Func<TagPairDto, bool> predicate, Func<TagPairDto, T> keySelector, bool isDesc = true);
 
         Task<IEnumerable<TagInfoWithFrequencyDto>> GetSortedBy<T>(Expression<Func<TagInfo, T>> keySelector, bool isDesc = true);
         Task<IEnumerable<TagInfoWithFrequencyDto>> GetSortedByFrequency(bool isDesc = true);

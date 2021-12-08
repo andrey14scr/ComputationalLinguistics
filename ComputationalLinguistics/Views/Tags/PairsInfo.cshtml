@@ -1,4 +1,5 @@
-﻿@model IEnumerable<TagPairViewModel>
+﻿@using ComputationalLinguistics.Tools
+@model TagPairsListViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -6,6 +7,42 @@
 
 <div>
     <h2 style="float: left">Список пар тэгов</h2>
+</div>
+
+<div>
+    <form asp-action="PairsInfo">
+        <div>
+            <div class="d-inline-flex p-2">
+                <label asp-for="SortBy">Сортировать по</label>
+            </div>
+            <div class="d-inline-flex p-2">
+                <select class="form-select" asp-for="SortBy" id="selectSort">
+                    <option value="@Variables.OnAlphabetPattern">Алфавиту ↓</option>
+                    <option value="@Variables.OnAlphabetBackPattern">Алфавиту ↑</option>
+                    <option value="@Variables.OnFrequencyPattern">Частоте ↑</option>
+                    <option value="@Variables.OnFrequencyBackPattern">Частоте ↓</option>
+                    <option value="@Variables.OnPatternPattern">Шаблону</option>
+                </select>
+            </div>
+
+            @if (Model.SortBy == Variables.OnPatternPattern)
+            {
+                <div class="d-inline-flex p-2">
+                    <input value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">
+                </div>
+            }
+            else
+            {
+                <div class="d-inline-flex">
+                    <input hidden value="@Model.Pattern" asp-for="Pattern" placeholder="шаблон" id="inputPattern">
+                </div>
+            }
+
+            <div class="d-inline-flex p-2">
+                <input type="submit" value="Применить">
+            </div>
+        </div>
+    </form>
 </div>
 
 <table class="table">
@@ -20,7 +57,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.TagPairs)
         {
             <tr>
                 <td class="col-md-1">
@@ -35,3 +72,8 @@
 </table>
 
 <a asp-action="Index"><input class="mt-2" type="button" value="Вернуться к списку"/></a>
+
+@section Scripts
+{
+    <script src="~/js/tagInfos.js"></script>
+}

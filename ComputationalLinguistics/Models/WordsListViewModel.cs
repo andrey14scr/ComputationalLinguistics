@@ -2,11 +2,9 @@
 
 namespace ComputationalLinguistics.Models
 {
-    public class WordsListViewModel
+    public class WordsListViewModel : SortBaseModel
     {
-        public string SortBy { get; set; }
         public List<WordViewModel> Words { get; set; }
-        public string Pattern { get; set; }
         public int WordsBlockSize { get; set; }
     }
 }

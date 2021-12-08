@@ -2,12 +2,8 @@
 
 namespace ComputationalLinguistics.Models
 {
-    public class TagsListViewModel
+    public class TagsListViewModel : SortBaseModel
     {
         public List<TagInfoViewModel> Tags { get; set; }
-
-        public string SortBy { get; set; }
-
-        public string Pattern { get; set; }
     }
 }
