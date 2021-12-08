@@ -13,7 +13,7 @@ namespace ComputationalLinguistics.Core.Services.Interfaces
         Task<IEnumerable<WordWithFrequencyDto>> GetSortedBy<T>(Expression<Func<Word, T>> keySelector, int skip, int take, bool isDesc = true);
         Task<IEnumerable<WordWithFrequencyDto>> GetSortedByFrequency(int skip, int take, bool isDesc = true);
 
-        Task<IEnumerable<WordWithFrequencyDto>> SortBy<T>(Expression<Func<Word, bool>> predicate,
+        Task<List<WordWithFrequencyDto>> SortBy<T>(Expression<Func<Word, bool>> predicate,
             Expression<Func<Word, T>> keySelector, int skip, int take);
         Task<IEnumerable<WordContextFile>> GetContextFiles(Guid id);
         Task<IEnumerable<int>> GetUsages(Guid wordId, Guid textFileId);

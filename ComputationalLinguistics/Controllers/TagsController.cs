@@ -8,12 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using ComputationalLinguistics.Core.Dto;
 using ComputationalLinguistics.DAL;
-using ComputationalLinguistics.DAL.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using ComputationalLinguistics.Core.Services.Interfaces;
-using ComputationalLinguistics.Core.Services.Implementation;
 using System.Threading.Tasks;
 using ComputationalLinguistics.Models;
+using ComputationalLinguistics.Tools;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -30,17 +29,16 @@ namespace ComputationalLinguistics.Controllers
             _context = context;
         }
 
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(string sortBy, string pattern)
         {
-            var tagDtos = await _tagsInfoService.GetAll();
-            var model = _mapper.Map<List<TagInfoViewModel>>(tagDtos);
+            var model = await GetTagViewModelsAsync(sortBy, pattern);
 
-            foreach (var ti in model)
+            return View(new TagsListViewModel
             {
-                ti.Frequency = await _tagsInfoService.GetCountByTagsName(ti.TagName);
-            }
-
-            return View(model);
+                Tags = model, 
+                Pattern = pattern, 
+                SortBy = sortBy,
+            });
         }
 
         public async Task<ActionResult> PairsInfo()
@@ -143,6 +141,33 @@ namespace ComputationalLinguistics.Controllers
             {
                 return View();
             }
+        }
+
+        private async Task<List<TagInfoViewModel>> GetTagViewModelsAsync(string sortBy, string pattern)
+        {
+            IEnumerable<TagInfoWithFrequencyDto> tags = new List<TagInfoWithFrequencyDto>();
+
+            switch (sortBy)
+            {
+                case Variables.OnFrequencyPattern:
+                    tags = await _tagsInfoService.GetSortedByFrequency();
+                    break;
+                case Variables.OnFrequencyBackPattern:
+                    tags = await _tagsInfoService.GetSortedByFrequency(false);
+                    break;
+                case Variables.OnPatternPattern:
+                    if (!string.IsNullOrWhiteSpace(pattern))
+                        tags = await _tagsInfoService.SortBy(t => t.TagName.Substring(0, pattern.Length) == pattern, w => w.TagName);
+                    break;
+                case Variables.OnAlphabetBackPattern:
+                    tags = await _tagsInfoService.GetSortedBy(t => t.TagName);
+                    break;
+                default:
+                    tags = await _tagsInfoService.GetSortedBy(t => t.TagName, false);
+                    break;
+            }
+
+            return _mapper.Map<List<TagInfoViewModel>>(tags);
         }
     }
 }

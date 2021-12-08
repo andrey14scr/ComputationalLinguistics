@@ -32,7 +32,7 @@ namespace ComputationalLinguistics.Controllers
                 wordsBlockSize = Variables.WordsBlockSize;
             }
 
-            var model = await GetWordViewModels(sortBy, pattern, 0, wordsBlockSize);
+            var model = await GetWordViewModelsAsync(sortBy, pattern, 0, wordsBlockSize);
 
             return View(new WordsListViewModel
             {
@@ -179,8 +179,12 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<ActionResult> Delete(Guid id, string previousPage)
         {
-            var word = await _wordService.GetById(id);
-            var model = _mapper.Map<WordViewModel>(word);
+            var wordDto = await _wordService.GetById(id);
+            var tagInfo = await _tagsInfoService.GetById(wordDto.TagInfoId);
+            var model = _mapper.Map<WordViewModel>(wordDto);
+            model.TagName = tagInfo.TagName;
+            model.Frequency = await _wordService.GetFrequency(id);
+            model.AbsoluteFrequency = await _wordService.GetAbsoluteFrequency(wordDto.Content);
 
             return View(new WordViewModelFrom() { PreviousPage = previousPage, WordViewModel = model });
         }
@@ -196,12 +200,12 @@ namespace ComputationalLinguistics.Controllers
         
         public async Task<ActionResult> List(string sortBy, string pattern, int skip, int next)
         {
-            var model = await GetWordViewModels(sortBy, pattern, skip, next);
+            var model = await GetWordViewModelsAsync(sortBy, pattern, skip, next);
 
             return View(model);
         }
 
-        private async Task<List<WordViewModel>> GetWordViewModels(string sortBy, string pattern, int skip, int next)
+        private async Task<List<WordViewModel>> GetWordViewModelsAsync(string sortBy, string pattern, int skip, int next)
         {
             IEnumerable<WordWithFrequencyDto> words = new List<WordWithFrequencyDto>();
 

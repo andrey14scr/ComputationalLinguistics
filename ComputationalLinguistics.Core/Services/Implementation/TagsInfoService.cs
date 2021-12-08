@@ -11,6 +11,8 @@ using Microsoft.Extensions.Caching.Memory;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ComputationalLinguistics.Core.Services.Implementation
@@ -102,6 +104,63 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             var tagInfo = await _unitOfWork.TagsInfo.GetNoTrackingWhere(ti => ti.TagName == tagName).FirstOrDefaultAsync();
 
             return await _unitOfWork.Words.GetNoTrackingWhere(w => w.TagInfoId == tagInfo.Id).CountAsync();
+        }
+
+        public async Task<IEnumerable<TagInfoWithFrequencyDto>> GetSortedBy<T>(Expression<Func<TagInfo, T>> keySelector, bool isDesc = true)
+        {
+            var query = _unitOfWork.TagsInfo.GetNoTracking();
+
+            query = isDesc ? query.OrderByDescending(keySelector) : query.OrderBy(keySelector);
+
+            var tags = await query
+                .Select(ti => new TagInfoWithFrequencyDto
+                {
+                    Id = ti.Id, 
+                    Info = ti.Info, 
+                    IsGeneric = ti.IsGeneric,
+                    TagName = ti.TagName,
+                    Frequency = _unitOfWork.Words.GetNoTracking().Count(w => w.TagInfoId == ti.Id),
+                })
+                .ToListAsync();
+
+            return tags;
+        }
+
+        public async Task<IEnumerable<TagInfoWithFrequencyDto>> GetSortedByFrequency(bool isDesc = true)
+        {
+            var query = _unitOfWork.TagsInfo.GetNoTracking()
+                .Select(ti => new TagInfoWithFrequencyDto
+                {
+                    Id = ti.Id, 
+                    Info = ti.Info, 
+                    IsGeneric = ti.IsGeneric,
+                    TagName = ti.TagName,
+                    Frequency = _unitOfWork.Words.GetNoTracking().Count(w => w.TagInfoId == ti.Id),
+                });
+
+            var tags = isDesc
+                ? await query.OrderByDescending(ti => ti.Frequency).ToListAsync()
+                : await query.OrderBy(ti => ti.Frequency).ToListAsync();
+            ;
+
+            return tags;
+        }
+
+        public async Task<List<TagInfoWithFrequencyDto>> SortBy<T>(Expression<Func<TagInfo, bool>> predicate, Expression<Func<TagInfo, T>> keySelector)
+        {
+            var tags = await _unitOfWork.TagsInfo.GetNoTrackingWhere(predicate)
+                .OrderBy(keySelector)
+                .Select(ti => new TagInfoWithFrequencyDto
+                {
+                    Id = ti.Id,  
+                    TagName = ti.TagName,
+                    Info = ti.Info, 
+                    IsGeneric = ti.IsGeneric,
+                    Frequency = _unitOfWork.Words.GetNoTracking().Count(w => w.TagInfoId == ti.Id),
+                })
+                .ToListAsync();
+
+            return tags;
         }
     }
 }

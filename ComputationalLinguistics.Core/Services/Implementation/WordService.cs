@@ -146,7 +146,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             return words;
         }
 
-        public async Task<IEnumerable<WordWithFrequencyDto>> SortBy<T>(Expression<Func<Word, bool>> predicate,Expression<Func<Word, T>> keySelector, int skip, int take)
+        public async Task<List<WordWithFrequencyDto>> SortBy<T>(Expression<Func<Word, bool>> predicate,Expression<Func<Word, T>> keySelector, int skip, int take)
         {
             var words = await _unitOfWork.Words.GetNoTrackingWhere(predicate)
                 .Include(w => w.TagInfo)
@@ -162,7 +162,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                 })
                 .ToListAsync();
             
-            return _mapper.Map<List<WordWithFrequencyDto>>(words);
+            return words;
         }
 
         public async Task Update(WordDto wordDto)
