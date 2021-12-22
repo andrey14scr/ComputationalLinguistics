@@ -11,6 +11,7 @@ using System.IO;
 using System.Threading.Tasks;
 using ComputationalLinguistics.Core.Dto;
 using System.Text;
+using System.Linq;
 
 namespace ComputationalLinguistics.Controllers
 {
@@ -30,7 +31,7 @@ namespace ComputationalLinguistics.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var texts = await _textService.GetAll();
+            var texts = (await _textService.GetAll()).OrderBy(t => t.FilePath);
             var model = _mapper.Map<List<TextFileViewModel>>(texts);
             return View(model);
         }
@@ -88,6 +89,20 @@ namespace ComputationalLinguistics.Controllers
             await _textService.ParseText(textFileDto.FilePath);
         }
 
+        [HttpPost]
+        public async Task ReTag([FromBody] TextReparseJsonModel reparseInfo)
+        {
+            var textFileDto = await _textService.GetById(reparseInfo.Id);
+
+            await using (var fileStream = new FileStream(textFileDto.FilePath, FileMode.Create))
+            {
+                var bytes = Encoding.UTF8.GetBytes(reparseInfo.Txt);
+                await fileStream.WriteAsync(bytes, 0, bytes.Length);
+            }
+
+            await _textService.ParseText(textFileDto.FilePath);
+        }
+
         public async Task<IActionResult> Details(Guid id, Guid? wordId)
         {
             var textFile = await _textService.GetById(id);
@@ -98,7 +113,6 @@ namespace ComputationalLinguistics.Controllers
             }
             
             var text = await System.IO.File.ReadAllTextAsync(textFile.FilePath);
-            var l = text.Length;
             var model = new TextFileInfoViewModel
             {
                 Id = id,
@@ -108,8 +122,8 @@ namespace ComputationalLinguistics.Controllers
 
             if (wordId.HasValue)
             {
-                var seeks = await _wordService.GetUsages(wordId.Value, id);
-                model.Seeks = seeks;
+                var offSets = await _wordService.GetUsages(wordId.Value, id);
+                model.OffSet = offSets.OrderBy(o => o);
                 model.Word = _wordService.GetById(wordId.Value).Result.Content;
             }
 

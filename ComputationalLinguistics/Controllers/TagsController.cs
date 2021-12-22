@@ -63,17 +63,17 @@ namespace ComputationalLinguistics.Controllers
                         if (patterns.Length == 2 && !string.IsNullOrWhiteSpace(patterns[0]) && !string.IsNullOrWhiteSpace(patterns[1]))
                         {
                             pairs = await _tagsInfoService.GetPairs(p => 
-                                p.FirstTag.Substring(0, patterns[0].Length) == patterns[0] &&
-                                p.SecondTag.Substring(0, patterns[1].Length) == patterns[1], 
+                                p.FirstTag.Substring(0, Math.Min(p.FirstTag.Length, patterns[0].Length)) == patterns[0].ToUpper() &&
+                                p.SecondTag.Substring(0, Math.Min(p.SecondTag.Length, patterns[1].Length)) == patterns[1].ToUpper(), 
                                 p => string.Concat(p.FirstTag, p.SecondTag));
                         }
                     }
                     break;
                 case Variables.OnAlphabetBackPattern:
-                    pairs = await _tagsInfoService.GetPairs(p => true, p => string.Concat(p.FirstTag, p.SecondTag));
+                    pairs = await _tagsInfoService.GetPairs(p => true, p => string.Concat(p.FirstTag, p.SecondTag), false);
                     break;
                 default:
-                    pairs = await _tagsInfoService.GetPairs(p => true, p => string.Concat(p.FirstTag, p.SecondTag), false);
+                    pairs = await _tagsInfoService.GetPairs(p => true, p => string.Concat(p.FirstTag, p.SecondTag));
                     break;
             }
 
@@ -181,7 +181,7 @@ namespace ComputationalLinguistics.Controllers
                     break;
                 case Variables.OnPatternPattern:
                     if (!string.IsNullOrWhiteSpace(pattern))
-                        tags = await _tagsInfoService.SortBy(t => t.TagName.Substring(0, pattern.Length) == pattern, w => w.TagName);
+                        tags = await _tagsInfoService.SortBy(t => t.TagName.Substring(0, pattern.Length) == pattern.ToUpper(), w => w.TagName);
                     break;
                 case Variables.OnAlphabetBackPattern:
                     tags = await _tagsInfoService.GetSortedBy(t => t.TagName, false);

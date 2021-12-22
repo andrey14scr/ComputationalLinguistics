@@ -19,7 +19,7 @@
 @section Scripts
 {
     <script>
-        var indexes = @Html.Raw(JsonSerializer.Serialize(Model.Seeks));
+        var indexes = @Html.Raw(JsonSerializer.Serialize(Model.OffSet));
         var word = @Html.Raw(JsonSerializer.Serialize(Model.Word));
     </script>
     <script src="~/js/wordsInText.js"></script>

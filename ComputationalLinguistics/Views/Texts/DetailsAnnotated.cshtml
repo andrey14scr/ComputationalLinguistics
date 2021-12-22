@@ -5,4 +5,10 @@
 }
 
 <h2>Аннотированный @Model.FileName</h2>
-<textarea readonly class="form-control" id="text" name="textFile" style="width: 100%; height: 78vh;">@Model.Text</textarea>
+<textarea class="form-control" id="text" name="textFile" style="width: 100%; height: 78vh;">@Model.Text</textarea>
+<input type="button" id="btn-reparse" onclick="reTag('@Model.Id')" class="btn btn-primary" value="Перезаписать"/>
+
+@section Scripts
+{
+    <script src="~/js/reTag.js"></script>
+}

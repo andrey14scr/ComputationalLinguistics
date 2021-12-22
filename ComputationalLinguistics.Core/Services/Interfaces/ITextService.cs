@@ -7,6 +7,8 @@ namespace ComputationalLinguistics.Core.Services.Interfaces
     {
         Task ParseText(string fileName);
 
+        Task ReTagText(TextFileDto textFileDto, string txt);
+
         Task<bool> Exists(string path);
     }
 }

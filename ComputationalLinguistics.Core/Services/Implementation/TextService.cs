@@ -74,12 +74,23 @@ namespace ComputationalLinguistics.Core.Services.Implementation
         {
             var textFile = _mapper.Map<TextFile>(textFileDto);
 
-            var wordsInText = await _unitOfWork.WordsInText
+            var words = await _unitOfWork.WordsInText
                 .GetNoTrackingWhere(wt => wt.TextFileId == textFile.Id)
                 .Select(w => w.Word)
                 .ToListAsync();
-            
-            _unitOfWork.Words.RemoveRange(wordsInText);
+
+            var wordsInText = await _unitOfWork.WordsInText
+                .GetTrackingWhere(wt => wt.TextFileId == textFile.Id)
+                .ToListAsync();
+
+            foreach (var wordInText in wordsInText)
+            {
+                wordInText.NextWordInText = null;
+                wordInText.NextWordInTextId = null;
+            }
+
+            _unitOfWork.WordsInText.RemoveRange(wordsInText);
+            //_unitOfWork.Words.RemoveRange(words);
             _unitOfWork.TextFiles.Remove(textFile);
             if (File.Exists(textFile.FilePath))
             {
@@ -116,24 +127,35 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             var textFile = await _unitOfWork.TextFiles.GetNoTracking().FirstOrDefaultAsync(t => t.FilePath == fileName);
             if (textFile is not null)
             {
-                var wordsInTextFilesToDelete = await _unitOfWork.WordsInText.GetTrackingWhere(w => w.TextFileId == textFile.Id).ToListAsync();
-                var wordsToDelete = wordsInTextFilesToDelete.Select(wit => _unitOfWork.Words.GetTrackingWhere(w => w.Id == wit.WordId).First()).ToList();
-                _unitOfWork.WordsInText.RemoveRange(wordsInTextFilesToDelete);
-                _unitOfWork.Words.RemoveRange(wordsToDelete);
-                await _unitOfWork.SaveChangesAsync();
-                //throw new Exception($"File {Path.GetFileName(fileName)} is already parsed");
-            }
-            else
-            {
-                textFile = new TextFile
-                {
-                    Id = Guid.NewGuid(),
-                    FilePath = fileName, 
-                    FileAnnotationPath = "Annotated\\" + Path.GetFileNameWithoutExtension(fileName) + "_annotated_" + Path.GetExtension(fileName),
-                };
+                var words = await _unitOfWork.WordsInText
+                    .GetNoTrackingWhere(wt => wt.TextFileId == textFile.Id)
+                    .Select(w => w.Word)
+                    .ToListAsync();
 
-                await _unitOfWork.TextFiles.AddAsync(textFile);
+                var wordsInTextT = await _unitOfWork.WordsInText
+                    .GetTrackingWhere(wt => wt.TextFileId == textFile.Id)
+                    .ToListAsync();
+
+                foreach (var wordInText in wordsInTextT)
+                {
+                    wordInText.NextWordInText = null;
+                    wordInText.NextWordInTextId = null;
+                }
+
+                _unitOfWork.WordsInText.RemoveRange(wordsInTextT);
+                _unitOfWork.TextFiles.Remove(textFile);
+
+                await _unitOfWork.SaveChangesAsync();
             }
+
+            textFile = new TextFile
+            {
+                Id = Guid.NewGuid(),
+                FilePath = fileName,
+                FileAnnotationPath = "Annotated\\" + Path.GetFileNameWithoutExtension(fileName) + "_annotated_" + Path.GetExtension(fileName),
+            };
+
+            await _unitOfWork.TextFiles.AddAsync(textFile);
 
             var annotatedText = string.Empty;
             var fileContent = await File.ReadAllTextAsync(fileName);
@@ -267,6 +289,50 @@ namespace ComputationalLinguistics.Core.Services.Implementation
             await _unitOfWork.WordsInText.AddRangeAsync(wordsInText);
             await _unitOfWork.Words.AddRangeAsync(newWords);
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task ReTagText(TextFileDto textFileDto, string txt)
+        {
+            var old = await File.ReadAllTextAsync(textFileDto.FilePath);
+
+            var oldTags = ParseOnTags(old);
+            var newTags = ParseOnTags(txt);
+
+            if (newTags.Count != oldTags.Count)
+            {
+                throw new Exception("Not equal sizes!");
+            }
+
+            for (int i = 0; i < oldTags.Count; i++)
+            {
+                if (oldTags[i].Tag != newTags[i].Tag)
+                {
+                    if (oldTags[i].Word != newTags[i].Word)
+                    {
+                        throw new Exception("Word was changed!");
+                    }
+
+
+                }
+            }
+        }
+
+        private List<WordTag> ParseOnTags(string text)
+        {
+            var arr = text.Split(' ');
+            var pairs = new List<WordTag>();
+
+            foreach (var item in arr)
+            {
+                var ind = item.IndexOf('[');
+                pairs.Add(new WordTag
+                {
+                    Word = item.Substring(0, ind), 
+                    Tag = item.Substring(ind + 1, item.Length - ind - 2),
+                });
+            }
+
+            return pairs;
         }
     }
 }

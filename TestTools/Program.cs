@@ -26,12 +26,34 @@ namespace TestTools
         public int OffSet { get; set; }
     }
 
+    public class WordTag
+    {
+        public string Word { get; set; }
+        public string Tag { get; set; }
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
-            var endPattern = ".?!;";
-            Console.WriteLine(endPattern.Contains(","));
+            var text = "asfdasd[RR] bbb[TT] cvxv[OP] dsfsdfdfs[IP] ";
+            var arr = text.Split(' ');
+            var pairs = new List<WordTag>();
+
+            foreach (var item in arr)
+            {
+                if (!string.IsNullOrWhiteSpace(item)) 
+                {
+                    var ind = item.IndexOf('[');
+                    pairs.Add(new WordTag
+                    {
+                        Word = item.Substring(0, ind),
+                        Tag = item.Substring(ind + 1, item.Length - ind - 2),
+                    });
+                }
+            }
+
+            Console.WriteLine();
         }
     }
 }

@@ -119,7 +119,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Info = ti.Info, 
                     IsGeneric = ti.IsGeneric,
                     TagName = ti.TagName,
-                    Frequency = _unitOfWork.Words.GetNoTracking().Count(w => w.TagInfoId == ti.Id),
+                    Frequency = _unitOfWork.WordsInText.GetNoTracking().Include(wit => wit.Word).Count(wit => wit.Word.TagInfoId == ti.Id),
                 })
                 .ToListAsync();
 
@@ -135,7 +135,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     Info = ti.Info, 
                     IsGeneric = ti.IsGeneric,
                     TagName = ti.TagName,
-                    Frequency = _unitOfWork.Words.GetNoTracking().Count(w => w.TagInfoId == ti.Id),
+                    Frequency = _unitOfWork.WordsInText.GetNoTracking().Include(wit => wit.Word).Count(wit => wit.Word.TagInfoId == ti.Id),
                 });
 
             var tags = isDesc
@@ -156,7 +156,7 @@ namespace ComputationalLinguistics.Core.Services.Implementation
                     TagName = ti.TagName,
                     Info = ti.Info, 
                     IsGeneric = ti.IsGeneric,
-                    Frequency = _unitOfWork.Words.GetNoTracking().Count(w => w.TagInfoId == ti.Id),
+                    Frequency = _unitOfWork.WordsInText.GetNoTracking().Include(wit => wit.Word).Count(wit => wit.Word.TagInfoId == ti.Id),
                 })
                 .ToListAsync();
 
